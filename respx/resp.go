@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/qf0129/gox"
 	"github.com/qf0129/gox/errx"
 )
 
@@ -16,7 +17,7 @@ type RespBody struct {
 
 func returnResp(c *gin.Context, httpCode int, code int, msg string, data any) {
 	c.JSON(httpCode, &RespBody{
-		ReqId: c.GetString(RequestIdKey),
+		ReqId: c.GetString(gox.KeyOfRequestId),
 		Code:  code,
 		Msg:   msg,
 		Data:  data,

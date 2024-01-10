@@ -4,10 +4,12 @@ import (
 	"strings"
 )
 
-const FixedKeyPage = "Page"
-const FixedKeyPageSize = "PageSize"
-const FixedKeyPreload = "Preload"
-const FixedKeyClosePaging = "ClosePaging"
+const (
+	FixedKeyPage        = "Page"
+	FixedKeyPageSize    = "PageSize"
+	FixedKeyPreload     = "Preload"
+	FixedKeyClosePaging = "ClosePaging"
+)
 
 var FIXED_KEYS = []string{FixedKeyPage, FixedKeyPageSize, FixedKeyPreload, FixedKeyClosePaging}
 

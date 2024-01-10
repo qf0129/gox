@@ -19,15 +19,15 @@ type Sqlite struct {
 }
 
 type Server struct {
-	ListenAddr       string
-	Domain           string
-	GinMode          string // debug,release,test
-	LogLevel         string // panic,fatal,error,warn,info,debug,trace
-	DBLogLevel       string // error,warn,info
-	ReadTimeout      int64
-	WriteTimeout     int64
-	TokenExpiredTime int64 // seconds
-	EncryptSecret    string
+	ListenAddr         string
+	Domain             string
+	GinMode            string // debug,release,test
+	LogLevel           string // panic,fatal,error,warn,info,debug,trace
+	DBLogLevel         string // error,warn,info
+	ReadTimeout        int64
+	WriteTimeout       int64
+	TokenExpiredSecond int
+	EncryptSecret      string
 }
 
 var (
@@ -36,15 +36,15 @@ var (
 		FilePath: "db.sqlite",
 	}
 	DefaultServer = Server{
-		ListenAddr:       ":8888",
-		Domain:           "",
-		GinMode:          "debug",
-		LogLevel:         "debug",
-		DBLogLevel:       "warn",
-		ReadTimeout:      60,
-		WriteTimeout:     60,
-		TokenExpiredTime: 3600,
-		EncryptSecret:    "DEFAULT_SECRET",
+		ListenAddr:         ":8888",
+		Domain:             "",
+		GinMode:            "debug",
+		LogLevel:           "debug",
+		DBLogLevel:         "warn",
+		ReadTimeout:        60,
+		WriteTimeout:       60,
+		TokenExpiredSecond: 3600,
+		EncryptSecret:      "DEFAULT_SECRET",
 	}
 )
 
