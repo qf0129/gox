@@ -66,13 +66,8 @@ func uploadApis(engine *gin.Engine) {
 	for _, route := range engine.Routes() {
 		key := concatApiKey(&route)
 		api, _ := daox.QueryOneByMap[modelx.Api](map[string]any{"key": key})
-		if api.Id != "" {
-			if api.Func != route.Handler {
-				api.Func = route.Handler
-				apis = append(apis, api)
-			}
-		} else {
-			apis = append(apis, modelx.Api{Key: key, Method: route.Method, Path: route.Path, Func: route.Handler})
+		if api.Id == "" {
+			apis = append(apis, modelx.Api{Key: key, Method: route.Method, Path: route.Path})
 		}
 	}
 
