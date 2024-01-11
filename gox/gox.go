@@ -6,34 +6,33 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/qf0129/gox/constx"
 	"github.com/qf0129/gox/gormx"
-	"github.com/qf0129/gox/gormx/daox"
-	"github.com/qf0129/gox/modelx"
+	"github.com/qf0129/gox/tmplx"
 )
 
 type Option struct {
-	GinEngine        *gin.Engine
-	HttpServer       *http.Server
-	GromxOption      *gormx.Option
-	EnablePermission bool
+	GinEngine      *gin.Engine
+	HttpServer     *http.Server
+	GromxOption    *gormx.Option
+	EnableTemplate bool
 }
 
 func Run(opt *Option) {
 	if opt.GinEngine == nil {
 		panic("RequiredHttpHandler")
 	}
-
-	if opt.EnablePermission {
+	if opt.EnableTemplate {
 		if opt.GromxOption == nil {
 			opt.GromxOption = &gormx.Option{}
 		}
 		if opt.GromxOption.Models == nil {
 			opt.GromxOption.Models = []any{}
 		}
-		opt.GromxOption.Models = append(opt.GromxOption.Models, &modelx.Api{}, &modelx.User{}, &modelx.Role{})
+		opt.GromxOption.Models = append(opt.GromxOption.Models, &tmplx.Api{}, &tmplx.User{}, &tmplx.Role{})
 		gormx.Connect(opt.GromxOption)
-		uploadApis(opt.GinEngine)
-		slog.Info("### EnablePermission: true")
+		tmplx.UploadApis(opt.GinEngine)
+		slog.Info("### EnableTemplate true")
 	} else {
 		if opt.GromxOption != nil {
 			gormx.Connect(opt.GromxOption)
@@ -51,32 +50,12 @@ func initHttpServer(opt *Option) {
 	}
 	opt.HttpServer.Handler = opt.GinEngine
 	if opt.HttpServer.Addr == "" {
-		opt.HttpServer.Addr = ":8080"
+		opt.HttpServer.Addr = constx.DefaultListenAddr
 	}
 	if opt.HttpServer.ReadTimeout == 0 {
-		opt.HttpServer.ReadTimeout = 60 * time.Second
+		opt.HttpServer.ReadTimeout = constx.DefaultReadTimeout * time.Second
 	}
 	if opt.HttpServer.WriteTimeout == 0 {
-		opt.HttpServer.WriteTimeout = 60 * time.Second
+		opt.HttpServer.WriteTimeout = constx.DefaultWriteTimeout * time.Second
 	}
-}
-
-func uploadApis(engine *gin.Engine) {
-	apis := []modelx.Api{}
-	for _, route := range engine.Routes() {
-		key := concatApiKey(&route)
-		api, _ := daox.QueryOneByMap[modelx.Api](map[string]any{"key": key})
-		if api.Id == "" {
-			apis = append(apis, modelx.Api{Key: key, Method: route.Method, Path: route.Path})
-		}
-	}
-
-	if len(apis) > 0 {
-		gormx.DB.Save(apis)
-	}
-	slog.Info("### UpdateApis", slog.Int("len", len(apis)))
-}
-
-func concatApiKey(route *gin.RouteInfo) string {
-	return route.Method + "|" + route.Path
 }

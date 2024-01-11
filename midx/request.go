@@ -6,8 +6,6 @@ import (
 	"github.com/rs/xid"
 )
 
-func SetRequestID() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		c.Set(constx.KeyOfRequestId, xid.New().String())
-	}
+func SetRequestID(c *gin.Context) {
+	c.Set(constx.KeyOfRequestId, xid.New().String())
 }

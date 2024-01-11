@@ -6,6 +6,7 @@ import (
 
 	"github.com/glebarez/sqlite"
 	"github.com/qf0129/gox/confx"
+	"github.com/qf0129/gox/constx"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -29,10 +30,10 @@ type Option struct {
 
 func initOption(opt *Option) {
 	if opt.ModelPrimaryKey == "" {
-		opt.ModelPrimaryKey = "id"
+		opt.ModelPrimaryKey = constx.DefaultModelPrimaryKey
 	}
 	if opt.QueryPageSize < 1 {
-		opt.QueryPageSize = 10
+		opt.QueryPageSize = constx.DefaultQueryPageSize
 	}
 	if opt.GormConfig == nil {
 		opt.GormConfig = &gorm.Config{}
@@ -41,7 +42,7 @@ func initOption(opt *Option) {
 		opt.GormConfig.NamingStrategy = schema.NamingStrategy{SingularTable: true}
 	}
 	if opt.GormConfig.Logger == nil {
-		opt.GormConfig.Logger = logger.Default.LogMode(logger.Warn)
+		opt.GormConfig.Logger = logger.Default.LogMode(logger.Error)
 	}
 }
 
@@ -63,7 +64,7 @@ func Connect(opt *Option) *gorm.DB {
 			opt.SqliteConfig = &confx.Sqlite{}
 		}
 		if opt.SqliteConfig.FilePath == "" {
-			opt.SqliteConfig.FilePath = "db.sqlite"
+			opt.SqliteConfig.FilePath = constx.DefaultSqliteFile
 		}
 		dbConn = sqlite.Open(opt.SqliteConfig.FilePath)
 		slog.Info("### Connected SQLite", slog.String("path", opt.SqliteConfig.FilePath))

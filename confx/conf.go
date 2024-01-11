@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log/slog"
 	"os"
+
+	"github.com/qf0129/gox/constx"
 )
 
 type Mysql struct {
@@ -19,32 +21,31 @@ type Sqlite struct {
 }
 
 type Server struct {
-	ListenAddr         string
-	Domain             string
-	GinMode            string // debug,release,test
-	LogLevel           string // panic,fatal,error,warn,info,debug,trace
-	DBLogLevel         string // error,warn,info
-	ReadTimeout        int64
-	WriteTimeout       int64
-	TokenExpiredSecond int
-	EncryptSecret      string
+	ListenAddr           string
+	GinMode              string // debug,release,test
+	LogLevel             string // panic,fatal,error,warn,info,debug,trace
+	DBLogLevel           string // error,warn,info
+	ReadTimeout          int64
+	WriteTimeout         int64
+	EncryptSecret        string
+	CookieDomain         string
+	CookieExpiredSeconds int
 }
 
 var (
 	DefaultMysql  = Mysql{}
 	DefaultSqlite = Sqlite{
-		FilePath: "db.sqlite",
+		FilePath: constx.DefaultSqliteFile,
 	}
 	DefaultServer = Server{
-		ListenAddr:         ":8888",
-		Domain:             "",
-		GinMode:            "debug",
-		LogLevel:           "debug",
-		DBLogLevel:         "warn",
-		ReadTimeout:        60,
-		WriteTimeout:       60,
-		TokenExpiredSecond: 3600,
-		EncryptSecret:      "DEFAULT_SECRET",
+		ListenAddr:           constx.DefaultListenAddr,
+		GinMode:              constx.DefaultGinMode,
+		LogLevel:             constx.DefaultLogLevel,
+		DBLogLevel:           constx.DefaultDBLogLevel,
+		ReadTimeout:          constx.DefaultReadTimeout,
+		WriteTimeout:         constx.DefaultWriteTimeout,
+		EncryptSecret:        constx.DefaultEncryptSecret,
+		CookieExpiredSeconds: constx.DefaultCookieExpiredSeconds,
 	}
 )
 
@@ -55,7 +56,7 @@ type BaseConfig struct {
 }
 
 func ReadJsonConfig(target any) {
-	data, err := os.ReadFile("config.json")
+	data, err := os.ReadFile("conf.json")
 	if err != nil {
 		slog.Warn("Read config file failed, running with default config.")
 		return

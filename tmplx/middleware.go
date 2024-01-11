@@ -1,4 +1,4 @@
-package midx
+package tmplx
 
 import (
 	"github.com/gin-gonic/gin"
@@ -12,10 +12,10 @@ import (
 )
 
 // 验证token
-func CheckToken[T any](conf *confx.Server) gin.HandlerFunc {
+func CheckTokenMiddleware(conf *confx.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tk, err := c.Cookie(constx.KeyOfCookieToken)
-		if err != nil {
+		if tk == "" || err != nil {
 			respx.Err(c, errx.InvalidToken)
 			return
 		}
@@ -26,7 +26,7 @@ func CheckToken[T any](conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 
-		existsUser, err := daox.QueryOneByPk[T](uid)
+		existsUser, err := daox.QueryOneByPk[User](uid)
 		if err != nil {
 			respx.Err(c, errx.UserNotFound.AddErr(err))
 			return

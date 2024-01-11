@@ -2,7 +2,6 @@ package securex
 
 import (
 	"encoding/binary"
-	"encoding/hex"
 	"errors"
 	"time"
 )
@@ -17,17 +16,12 @@ func CreateToken(body string, secretKey string) (string, error) {
 		tokenByte[i+8] = byte(v)
 	}
 
-	token, err := DesEncrypt(tokenByte, []byte(secretKey))
-	return hex.EncodeToString(token), err
+	return Encrypt(tokenByte, []byte(secretKey))
 }
 
 // 解析令牌
 func ParseToken(token string, secretKey string, expiredSeconds int64) (string, error) {
-	text, err := hex.DecodeString(token)
-	if err != nil {
-		return "", err
-	}
-	tokenStr, err := DesDecrypt([]byte(text), []byte(secretKey))
+	tokenStr, err := Decrypt(token, []byte(secretKey))
 	if err != nil {
 		return "", err
 	}
