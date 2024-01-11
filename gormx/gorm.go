@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/glebarez/sqlite"
 	"github.com/qf0129/gox/confx"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/gorm/schema"
@@ -27,14 +27,7 @@ type Option struct {
 	QueryPageSize   int
 }
 
-var DefaultGormConfig = &gorm.Config{
-	NamingStrategy: schema.NamingStrategy{
-		SingularTable: true,
-	},
-	Logger: logger.Default.LogMode(logger.Warn),
-}
-
-func Connect(opt *Option) *gorm.DB {
+func initOption(opt *Option) {
 	if opt.ModelPrimaryKey == "" {
 		opt.ModelPrimaryKey = "id"
 	}
@@ -42,12 +35,21 @@ func Connect(opt *Option) *gorm.DB {
 		opt.QueryPageSize = 10
 	}
 	if opt.GormConfig == nil {
-		opt.GormConfig = DefaultGormConfig
+		opt.GormConfig = &gorm.Config{}
 	}
-	Opt = opt
+	if opt.GormConfig.NamingStrategy == nil {
+		opt.GormConfig.NamingStrategy = schema.NamingStrategy{SingularTable: true}
+	}
+	if opt.GormConfig.Logger == nil {
+		opt.GormConfig.Logger = logger.Default.LogMode(logger.Warn)
+	}
+}
+
+func Connect(opt *Option) *gorm.DB {
+	initOption(opt)
 
 	var dbConn gorm.Dialector
-	if opt.MysqlConfig.Host != "" {
+	if opt.MysqlConfig != nil && opt.MysqlConfig.Host != "" {
 		dbConn = mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			opt.MysqlConfig.Username,
 			opt.MysqlConfig.Password,
@@ -55,13 +57,16 @@ func Connect(opt *Option) *gorm.DB {
 			opt.MysqlConfig.Port,
 			opt.MysqlConfig.Database,
 		))
-		slog.Info(fmt.Sprintf("Connected DB with mysql:%s@%s", opt.MysqlConfig.Username, opt.MysqlConfig.Host))
+		slog.Info("### Connected MySQL", slog.String("host", opt.MysqlConfig.Host), slog.String("user", opt.MysqlConfig.Username))
 	} else {
+		if opt.SqliteConfig == nil {
+			opt.SqliteConfig = &confx.Sqlite{}
+		}
 		if opt.SqliteConfig.FilePath == "" {
 			opt.SqliteConfig.FilePath = "db.sqlite"
 		}
 		dbConn = sqlite.Open(opt.SqliteConfig.FilePath)
-		slog.Info(fmt.Sprintf("Connected DB with sqlite:%s", opt.SqliteConfig.FilePath))
+		slog.Info("### Connected SQLite", slog.String("path", opt.SqliteConfig.FilePath))
 	}
 
 	var err error
@@ -73,5 +78,7 @@ func Connect(opt *Option) *gorm.DB {
 	if err := DB.AutoMigrate(opt.Models...); err != nil {
 		panic("MigrateModelErr:" + err.Error())
 	}
+
+	Opt = opt
 	return DB
 }
