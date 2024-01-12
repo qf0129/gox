@@ -13,10 +13,11 @@ var (
 	DataAlreadyExists = &Err{Code: 100106, Msg: "数据已存在"}
 
 	InvalidParams       = &Err{Code: 100201, Msg: "无效的参数"}
-	InvalidHeader       = &Err{Code: 100202, Msg: "无效的请求头"}
-	ValidateParamFailed = &Err{Code: 100203, Msg: "校验参数失败"}
-	ParseParamFailed    = &Err{Code: 100204, Msg: "解析参数失败"}
-	NoPermission        = &Err{Code: 100205, Msg: "没有权限"}
+	InvalidJsonParams   = &Err{Code: 100202, Msg: "无效的JSON参数"}
+	InvalidHeader       = &Err{Code: 100203, Msg: "无效的请求头"}
+	ValidateParamFailed = &Err{Code: 100204, Msg: "校验参数失败"}
+	ParseParamFailed    = &Err{Code: 100205, Msg: "解析参数失败"}
+	NoPermission        = &Err{Code: 100206, Msg: "没有权限"}
 
 	AuthFailed        = &Err{Code: 100401, Msg: "认证失败"}
 	InvalidToken      = &Err{Code: 100402, Msg: "无效的令牌"}

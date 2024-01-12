@@ -5,6 +5,8 @@ import (
 	"github.com/qf0129/gox/confx"
 	"github.com/qf0129/gox/constx"
 	"github.com/qf0129/gox/errx"
+	"github.com/qf0129/gox/ginx"
+	"github.com/qf0129/gox/gormx"
 	"github.com/qf0129/gox/gormx/daox"
 	"github.com/qf0129/gox/respx"
 	"github.com/qf0129/gox/securex"
@@ -108,4 +110,33 @@ func delAuthCookie(c *gin.Context) {
 func setAuthCookie(c *gin.Context, token, userId string, conf *confx.Server) {
 	c.SetCookie(constx.KeyOfCookieToken, token, conf.CookieExpiredSeconds, "/", conf.CookieDomain, false, true)
 	c.SetCookie(constx.KeyOfCookieUserId, userId, conf.CookieExpiredSeconds, "/", conf.CookieDomain, false, false)
+}
+
+type UpdatePasswordBody struct {
+	OldPsd string `json:"old_psd" validate:"gte=2,lte=50"`
+	NewPsd string `json:"new_psd" validate:"gte=2,lte=50"`
+}
+
+func UpdatePassword(c *gin.Context) {
+	user := ginx.GetRequestUser[User](c)
+
+	var req *UpdatePasswordBody
+	if err := c.ShouldBindJSON(&req); err != nil {
+		respx.Err(c, errx.InvalidJsonParams)
+		return
+	}
+
+	if err := validx.Validate(req); err != nil {
+		respx.Err(c, err)
+		return
+	}
+
+	if !user.CheckPassword(req.OldPsd) {
+		respx.Err(c, errx.IncorrectPassword)
+		return
+	}
+
+	user.SetPassword(req.NewPsd)
+	gormx.DB.Save(user)
+	respx.OK(c, true)
 }

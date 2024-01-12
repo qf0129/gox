@@ -1,6 +1,9 @@
 package tmplx
 
-import "github.com/qf0129/gox/modelx"
+import (
+	"github.com/qf0129/gox/modelx"
+	"golang.org/x/crypto/bcrypt"
+)
 
 type Api struct {
 	modelx.BaseModel
@@ -31,4 +34,21 @@ type User struct {
 	Online   bool   `gorm:"default:false;" json:"online"`
 
 	Roles []*Role `gorm:"many2many:user_role;" json:"roles"`
+}
+
+func (u *User) SetPassword(password string) error {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(hash)
+	return nil
+}
+
+func (u *User) CheckPassword(password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
+	if err != nil {
+		return false
+	}
+	return true
 }

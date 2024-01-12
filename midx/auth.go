@@ -20,13 +20,24 @@ func CheckToken[T any](conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 
-		uid, err := securex.ParseToken(tk, conf.EncryptSecret, int64(conf.CookieExpiredSeconds))
+		uid1, err := c.Cookie(constx.KeyOfCookieUserId)
+		if err != nil {
+			respx.Err(c, errx.InvalidToken)
+			return
+		}
+
+		uid2, err := securex.ParseToken(tk, conf.EncryptSecret, int64(conf.CookieExpiredSeconds))
 		if err != nil {
 			respx.Err(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
-		existsUser, err := daox.QueryOneByPk[T](uid)
+		if uid1 != uid2 {
+			respx.Err(c, errx.InvalidToken.AddErr(err))
+			return
+		}
+
+		existsUser, err := daox.QueryOneByPk[T](uid2)
 		if err != nil {
 			respx.Err(c, errx.UserNotFound.AddErr(err))
 			return
