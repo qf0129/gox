@@ -1,9 +1,9 @@
 package structx
 
 import (
-	"encoding/json"
 	"log/slog"
 	"reflect"
+	"strings"
 )
 
 func GetFields(obj any) []string {
@@ -26,22 +26,22 @@ func GetFields(obj any) []string {
 }
 
 func GetJsonFields(obj any) []string {
-	var objMap map[string]any
-
-	b, err := json.Marshal(obj)
-	if err != nil {
-		slog.Warn("structs: MarshalJsonFailed")
-		return nil
+	t := reflect.TypeOf(obj)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
 	}
-	err = json.Unmarshal(b, &objMap)
-	if err != nil {
-		slog.Warn("structs: UnMarshalJsonFailed, " + string(b))
-		return nil
+	keys := make([]string, 0)
+	for i := 0; i < t.NumField(); i++ {
+		field := t.Field(i)
+		tagText := field.Tag.Get("json")
+		tags := strings.Split(tagText, ",")
+		if len(tags) > 0 && tags[0] != "-" {
+			if tags[0] == "" {
+				keys = append(keys, field.Name)
+			} else {
+				keys = append(keys, tags[0])
+			}
+		}
 	}
-
-	var result []string
-	for k := range objMap {
-		result = append(result, k)
-	}
-	return result
+	return keys
 }

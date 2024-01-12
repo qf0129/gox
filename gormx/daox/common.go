@@ -29,6 +29,7 @@ type QueryBody struct {
 	Filter    string         `json:"filter" form:"filter"`         // 过滤条件, 'key1:value1|key2:value2'
 	FilterMap map[string]any `json:"filter_map" form:"filter_map"` // 过滤条件map
 	Fields    []string       `json:"fields" form:"fields"`         // 查询字段
+	Params    map[string]any `json:"-" form:"-"`                   // 查询参数
 }
 
 func (query *QueryBody) ParseFilterToMap() {
