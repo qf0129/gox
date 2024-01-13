@@ -7,14 +7,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/constx"
-	"github.com/qf0129/gox/gormx"
+	"github.com/qf0129/gox/dbx"
 	"github.com/qf0129/gox/tmplx"
 )
 
 type Option struct {
 	GinEngine      *gin.Engine
 	HttpServer     *http.Server
-	GromxOption    *gormx.Option
+	DbOption       *dbx.Option
 	EnableTemplate bool
 }
 
@@ -23,19 +23,19 @@ func Run(opt *Option) {
 		panic("RequiredHttpHandler")
 	}
 	if opt.EnableTemplate {
-		if opt.GromxOption == nil {
-			opt.GromxOption = &gormx.Option{}
+		if opt.DbOption == nil {
+			opt.DbOption = &dbx.Option{}
 		}
-		if opt.GromxOption.Models == nil {
-			opt.GromxOption.Models = []any{}
+		if opt.DbOption.Models == nil {
+			opt.DbOption.Models = []any{}
 		}
-		opt.GromxOption.Models = append(opt.GromxOption.Models, &tmplx.Api{}, &tmplx.User{}, &tmplx.Role{})
-		gormx.Connect(opt.GromxOption)
+		opt.DbOption.Models = append(opt.DbOption.Models, &tmplx.Api{}, &tmplx.User{}, &tmplx.Role{})
+		dbx.Connect(opt.DbOption)
 		tmplx.UploadApis(opt.GinEngine)
 		slog.Info("### EnableTemplate true")
 	} else {
-		if opt.GromxOption != nil {
-			gormx.Connect(opt.GromxOption)
+		if opt.DbOption != nil {
+			dbx.Connect(opt.DbOption)
 		}
 	}
 

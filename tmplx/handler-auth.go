@@ -4,10 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/confx"
 	"github.com/qf0129/gox/constx"
+	"github.com/qf0129/gox/dbx"
 	"github.com/qf0129/gox/errx"
 	"github.com/qf0129/gox/ginx"
-	"github.com/qf0129/gox/gormx"
-	"github.com/qf0129/gox/gormx/daox"
 	"github.com/qf0129/gox/respx"
 	"github.com/qf0129/gox/securex"
 	"github.com/qf0129/gox/validx"
@@ -27,7 +26,7 @@ func HandleSignIn(conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 
-		existUser, er := daox.QueryOneByMap[User](map[string]any{"username": req.Username})
+		existUser, er := dbx.QueryOneByMap[User](map[string]any{"username": req.Username})
 		if er != nil {
 			respx.Err(c, errx.UserNotFound)
 			return
@@ -63,7 +62,7 @@ func HandleSignUp(conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 
-		existUser, _ := daox.QueryOneByMap[User](map[string]any{"username": req.Username})
+		existUser, _ := dbx.QueryOneByMap[User](map[string]any{"username": req.Username})
 		if existUser.Id != "" {
 			respx.Err(c, errx.UserAlreadyExists)
 			return
@@ -80,7 +79,7 @@ func HandleSignUp(conf *confx.Server) gin.HandlerFunc {
 			Password: psdHash,
 		}
 
-		if er = daox.CreateOne[User](u); er != nil {
+		if er = dbx.Create[User](u); er != nil {
 			respx.Err(c, errx.CreateUser.AddErr(er))
 			return
 		}
@@ -90,7 +89,7 @@ func HandleSignUp(conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 		setAuthCookie(c, token, u.Id, conf)
-		respx.OK(c, gin.H{"id": u.Id})
+		respx.OK(c, gin.H{dbx.Opt.ModelPrimaryKey: u.Id})
 	}
 }
 
@@ -137,6 +136,6 @@ func UpdatePassword(c *gin.Context) {
 	}
 
 	user.SetPassword(req.NewPsd)
-	gormx.DB.Save(user)
+	dbx.DB.Save(user)
 	respx.OK(c, true)
 }

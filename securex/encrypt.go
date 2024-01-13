@@ -62,7 +62,7 @@ func Decrypt(encryptedText string, key []byte) ([]byte, error) {
 	// 去除填充
 	padding := int(plaintext[len(plaintext)-1])
 	if padding < 1 || int(padding) > len(plaintext) {
-		return nil, fmt.Errorf("无效的填充")
+		return nil, fmt.Errorf("InvalidEncryptPadding")
 	}
 	plaintext = plaintext[:len(plaintext)-padding]
 

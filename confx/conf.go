@@ -1,11 +1,11 @@
 package confx
 
 import (
-	"encoding/json"
 	"log/slog"
 	"os"
 
 	"github.com/qf0129/gox/constx"
+	"github.com/qf0129/gox/jsonx"
 )
 
 type Mysql struct {
@@ -61,7 +61,7 @@ func ReadJsonConfig(target any) {
 		slog.Warn("Read config file failed, running with default config.")
 		return
 	}
-	err = json.Unmarshal(data, target)
+	err = jsonx.Unmarshal(data, target)
 	if err != nil {
 		panic("UnmarshalConfigFailed: " + err.Error())
 	}

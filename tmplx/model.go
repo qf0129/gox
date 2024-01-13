@@ -7,17 +7,17 @@ import (
 
 type Api struct {
 	modelx.BaseModel
-	Group  string `gorm:"index;type:varchar(50);" json:"group"`
-	Key    string `gorm:"index;type:varchar(200);" json:"key"`
+	Key    string `gorm:"index;type:varchar(200);index;not null;" json:"key"`
 	Method string `gorm:"index;type:varchar(20);" json:"method"`
 	Path   string `gorm:"type:varchar(200);" json:"path"`
+	Group  string `gorm:"index;type:varchar(50);" json:"group"`
 	// Func        string `gorm:"type:varchar(200);" json:"func"`
 	Description string `gorm:"type:varchar(500);" json:"description"`
 }
 
 type Role struct {
 	modelx.BaseModel
-	Name        string `gorm:"index;type:varchar(100);" json:"name"`
+	Name        string `gorm:"type:varchar(100);index;not null" json:"name"`
 	Description string `gorm:"type:varchar(500);" json:"description"`
 }
 
@@ -46,9 +46,5 @@ func (u *User) SetPassword(password string) error {
 }
 
 func (u *User) CheckPassword(password string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password))
-	if err != nil {
-		return false
-	}
-	return true
+	return bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)) == nil
 }

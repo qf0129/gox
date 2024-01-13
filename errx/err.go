@@ -4,20 +4,22 @@ import "fmt"
 
 // common
 var (
-	RequestFailed     = &Err{Code: 100100, Msg: "请求失败"}
-	CreateDataFailed  = &Err{Code: 100101, Msg: "新建数据失败"}
-	QueryDataFailed   = &Err{Code: 100102, Msg: "查询数据失败"}
-	UpdateDataFailed  = &Err{Code: 100103, Msg: "更新数据失败"}
-	DeleteDataFailed  = &Err{Code: 100104, Msg: "删除数据失败"}
-	DataNotExists     = &Err{Code: 100105, Msg: "数据不存在"}
-	DataAlreadyExists = &Err{Code: 100106, Msg: "数据已存在"}
+	RequestFailed       = &Err{Code: 100100, Msg: "请求失败"}
+	CreateDataFailed    = &Err{Code: 100101, Msg: "新建数据失败"}
+	QueryDataFailed     = &Err{Code: 100102, Msg: "查询数据失败"}
+	UpdateDataFailed    = &Err{Code: 100103, Msg: "更新数据失败"}
+	DeleteDataFailed    = &Err{Code: 100104, Msg: "删除数据失败"}
+	TargetNotExists     = &Err{Code: 100105, Msg: "目标数据不存在"}
+	TargetAlreadyExists = &Err{Code: 100106, Msg: "目标数据已存在"}
 
-	InvalidParams       = &Err{Code: 100201, Msg: "无效的参数"}
-	InvalidJsonParams   = &Err{Code: 100202, Msg: "无效的JSON参数"}
-	InvalidHeader       = &Err{Code: 100203, Msg: "无效的请求头"}
-	ValidateParamFailed = &Err{Code: 100204, Msg: "校验参数失败"}
-	ParseParamFailed    = &Err{Code: 100205, Msg: "解析参数失败"}
-	NoPermission        = &Err{Code: 100206, Msg: "没有权限"}
+	InvalidParams     = &Err{Code: 100201, Msg: "无效的参数"}
+	InvalidJsonParams = &Err{Code: 100202, Msg: "无效的JSON参数"}
+	InvalidPathParams = &Err{Code: 100203, Msg: "无效的路径参数"}
+	InvalidHeader     = &Err{Code: 100204, Msg: "无效的请求头"}
+
+	ValidateParamFailed = &Err{Code: 100211, Msg: "校验参数失败"}
+	ParseParamFailed    = &Err{Code: 100212, Msg: "解析参数失败"}
+	NoPermission        = &Err{Code: 100213, Msg: "没有权限"}
 
 	AuthFailed        = &Err{Code: 100401, Msg: "认证失败"}
 	InvalidToken      = &Err{Code: 100402, Msg: "无效的令牌"}

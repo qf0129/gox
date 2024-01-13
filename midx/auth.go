@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/confx"
 	"github.com/qf0129/gox/constx"
+	"github.com/qf0129/gox/dbx"
 	"github.com/qf0129/gox/errx"
 	"github.com/qf0129/gox/ginx"
-	"github.com/qf0129/gox/gormx/daox"
 	"github.com/qf0129/gox/respx"
 	"github.com/qf0129/gox/securex"
 )
@@ -37,7 +37,7 @@ func CheckToken[T any](conf *confx.Server) gin.HandlerFunc {
 			return
 		}
 
-		existsUser, err := daox.QueryOneByPk[T](uid2)
+		existsUser, err := dbx.QueryOneByPk[T](uid2)
 		if err != nil {
 			respx.Err(c, errx.UserNotFound.AddErr(err))
 			return

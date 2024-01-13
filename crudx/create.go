@@ -1,50 +1,80 @@
 package crudx
 
 import (
-	"reflect"
-
 	"github.com/gin-gonic/gin"
+	"github.com/qf0129/gox/dbx"
 	"github.com/qf0129/gox/errx"
-	"github.com/qf0129/gox/gormx/daox"
+	"github.com/qf0129/gox/jsonx"
 	"github.com/qf0129/gox/respx"
-	"github.com/qf0129/gox/strx"
 )
 
-func CreateModelHandler[T any]() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		var model T
-		if er := c.ShouldBindJSON(&model); er != nil {
-			respx.Err(c, errx.InvalidParams.AddErr(er))
-			return
-		}
-
-		er := daox.CreateOne[T](&model)
-		if er != nil {
-			respx.Err(c, errx.CreateDataFailed.AddErr(er))
-			return
-		}
-		respx.OK(c, model)
-	}
+// 查询选项
+type CreateManyOption struct {
+	ExtraParams   map[string]string
+	PathParamsMap map[string]string
 }
 
-func CreateModelChildHandler[T any](parentId string) gin.HandlerFunc {
+func CreateManyHandler[T any](options ...CreateManyOption) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var model T
-		if er := c.ShouldBindJSON(&model); er != nil {
-			respx.Err(c, errx.InvalidParams.AddErr(er))
+		// 请求json转map数组
+		mapList := []map[string]any{}
+		if err := c.ShouldBindJSON(&mapList); err != nil {
+			respx.Err(c, errx.InvalidParams.AddErr(err))
 			return
 		}
 
-		parentIdField := reflect.ValueOf(&model).Elem().FieldByName(strx.SnakeToCamelCase(parentId))
-		if parentIdField.CanSet() {
-			parentIdField.SetString(c.Param("id"))
+		var opt *CreateManyOption
+		if len(options) > 0 {
+			opt = &options[0]
 		}
 
-		er := daox.CreateOne[T](&model)
-		if er != nil {
-			respx.Err(c, errx.CreateDataFailed.AddErr(er))
+		if opt != nil {
+			// 添加额外参数
+			if opt.ExtraParams != nil {
+				for _, item := range mapList {
+					for k, v := range opt.ExtraParams {
+						item[k] = v
+					}
+				}
+			}
+			if opt.PathParamsMap != nil {
+				// 读取路径参数
+				pathParams := map[string]string{}
+				for k, v := range opt.PathParamsMap {
+					pathParamVal := c.Param(k)
+					if pathParamVal != "" {
+						pathParams[v] = pathParamVal
+					}
+				}
+				// 添加路径参数
+				for _, item := range mapList {
+					for k, v := range pathParams {
+						item[k] = v
+					}
+				}
+			}
+		}
+
+		// map转json
+		jsonByte, err := jsonx.Marshal(mapList)
+		if err != nil {
+			respx.Err(c, errx.InvalidParams.AddErr(err))
 			return
 		}
-		respx.OK(c, model)
+
+		// json转结构体数组
+		var items []T
+		err = jsonx.Unmarshal(jsonByte, &items)
+		if err != nil {
+			respx.Err(c, errx.InvalidParams.AddErr(err))
+			return
+		}
+
+		// 存储结构体
+		if err := dbx.Create[T](items); err != nil {
+			respx.Err(c, errx.CreateDataFailed.AddErr(err))
+			return
+		}
+		respx.OK(c, true)
 	}
 }
