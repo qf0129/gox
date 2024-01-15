@@ -9,11 +9,11 @@ import (
 	"github.com/qf0129/gox/structx"
 )
 
-func initOption(c *gin.Context, options ...*dbx.QueryOption) (opt *dbx.QueryOption, err error) {
+func initOption(c *gin.Context, options ...dbx.QueryOption) (opt dbx.QueryOption, err error) {
 	if len(options) > 0 {
 		opt = options[0]
 	} else {
-		opt = &dbx.QueryOption{}
+		opt = dbx.QueryOption{}
 	}
 	if opt.Where == nil {
 		opt.Where = map[string]any{}
@@ -65,7 +65,7 @@ func initOption(c *gin.Context, options ...*dbx.QueryOption) (opt *dbx.QueryOpti
 	return
 }
 
-func QueryManyHandler[T any](options ...*dbx.QueryOption) gin.HandlerFunc {
+func QueryManyHandler[T any](options ...dbx.QueryOption) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		opt, err := initOption(c, options...)
 		if err != nil {
@@ -75,9 +75,9 @@ func QueryManyHandler[T any](options ...*dbx.QueryOption) gin.HandlerFunc {
 
 		var result any
 		if opt.NoPaging {
-			result, err = dbx.QueryAll[T](opt) // 不分页
+			result, err = dbx.QueryAll[T](&opt) // 不分页
 		} else {
-			result, err = dbx.QueryPage[T](opt) // 分页
+			result, err = dbx.QueryPage[T](&opt) // 分页
 		}
 		if err != nil {
 			respx.Err(c, errx.QueryDataFailed.AddErr(err))
@@ -87,7 +87,7 @@ func QueryManyHandler[T any](options ...*dbx.QueryOption) gin.HandlerFunc {
 	}
 }
 
-func QueryAssociationHandler[P any, T any](field string, options ...*dbx.QueryOption) gin.HandlerFunc {
+func QueryAssociationHandler[P any, T any](field string, options ...dbx.QueryOption) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		opt, err := initOption(c, options...)
 		if err != nil {
@@ -103,9 +103,9 @@ func QueryAssociationHandler[P any, T any](field string, options ...*dbx.QueryOp
 
 		var result any
 		if opt.NoPaging {
-			result, err = dbx.QueryAssociationAll[T](model, field, opt)
+			result, err = dbx.QueryAssociationAll[T](model, field, &opt)
 		} else {
-			result, err = dbx.QueryAssociationPage[T](model, field, opt)
+			result, err = dbx.QueryAssociationPage[T](model, field, &opt)
 		}
 		if err != nil {
 			respx.Err(c, errx.QueryDataFailed.AddErr(err))

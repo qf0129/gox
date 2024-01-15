@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/qf0129/gox/constx"
 	"gorm.io/gorm"
 )
 
@@ -47,7 +48,7 @@ func getQueryOption(options ...*QueryOption) (opt *QueryOption) {
 		opt.PageNum = 1
 	}
 	if opt.PageSize < 1 {
-		opt.PageSize = Opt.QueryPageSize
+		opt.PageSize = constx.DefaultQueryPageSize
 	}
 	return
 }

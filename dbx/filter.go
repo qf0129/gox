@@ -20,7 +20,7 @@ func paramsMapToFilters(params map[string]any) (funcs []filteFunc) {
 		if len(ks) > 1 {
 			funcs = append(funcs, filteKeyFunc(ks[0], ks[1], v))
 		} else {
-			funcs = append(funcs, filteKeyFunc(k, "eq", v))
+			funcs = append(funcs, filteKeyFunc(k, "", v))
 		}
 	}
 	return
@@ -29,6 +29,8 @@ func paramsMapToFilters(params map[string]any) (funcs []filteFunc) {
 func filteKeyFunc(key string, operater string, val any) filteFunc {
 	return func(q *gorm.DB) *gorm.DB {
 		switch operater {
+		case "":
+			return q.Where(map[string]any{key: val})
 		case "eq":
 			return q.Where(fmt.Sprintf("`%s` = ?", key), val)
 		case "ne":
@@ -67,7 +69,7 @@ func filteKeyFunc(key string, operater string, val any) filteFunc {
 			}
 			return q.Order(fmt.Sprintf("%s %s", key, val))
 		default:
-			return q.Where("? = '?'", key, val)
+			return q.Where(map[string]any{key: val})
 		}
 	}
 }
