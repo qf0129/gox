@@ -5,7 +5,7 @@ import "fmt"
 // common
 var (
 	RequestFailed       = &Err{Code: 100100, Msg: "请求失败"}
-	CreateDataFailed    = &Err{Code: 100101, Msg: "新建数据失败"}
+	CreateDataFailed    = &Err{Code: 100101, Msg: "创建数据失败"}
 	QueryDataFailed     = &Err{Code: 100102, Msg: "查询数据失败"}
 	UpdateDataFailed    = &Err{Code: 100103, Msg: "更新数据失败"}
 	DeleteDataFailed    = &Err{Code: 100104, Msg: "删除数据失败"}
@@ -28,7 +28,6 @@ var (
 	IncorrectPassword = &Err{Code: 100405, Msg: "密码不正确"}
 	HashPassword      = &Err{Code: 100406, Msg: "哈希密码失败"}
 	CreateToken       = &Err{Code: 100407, Msg: "创建令牌失败"}
-	CreateUser        = &Err{Code: 100408, Msg: "创建用户失败"}
 )
 
 type Err struct {

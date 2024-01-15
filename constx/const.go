@@ -1,10 +1,11 @@
 package constx
 
 const (
-	KeyOfRequestId    = "reqId"
-	KeyOfRequestUser  = "reqUser"
-	KeyOfCookieToken  = "t"
-	KeyOfCookieUserId = "u"
+	KeyOfRequestId     = "reqId"
+	KeyOfRequestUser   = "reqUser"
+	KeyOfRequestUserId = "reqUserId"
+	KeyOfCookieToken   = "t"
+	KeyOfCookieUserId  = "u"
 )
 
 const (
