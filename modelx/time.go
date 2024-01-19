@@ -45,3 +45,7 @@ func (t *Time) Scan(v interface{}) error {
 func (t *Time) String() string {
 	return fmt.Sprintf("hhh:%s", time.Time(*t).String())
 }
+
+func (t *Time) Time() time.Time {
+	return time.Time(*t)
+}

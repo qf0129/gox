@@ -23,8 +23,6 @@ type QueryBody struct {
 }
 
 type QueryOption struct {
-	// QueryBody
-
 	PageNum  int    // 页数, 默认1
 	PageSize int    // 每页数量, 默认10
 	NoPaging bool   // 关闭分页, 默认false
