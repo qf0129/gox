@@ -37,6 +37,6 @@ func ErrRequest(c *gin.Context, msg string) {
 	Err(c, errx.RequestFailed.AddMsg(msg))
 }
 
-func ErrAuth(c *gin.Context) {
-	Err(c, errx.AuthFailed)
+func ErrAuth(c *gin.Context, err *errx.Err) {
+	returnResp(c, http.StatusUnauthorized, err.Code, err.Msg, nil)
 }

@@ -22,30 +22,30 @@ func CheckTokenMiddileWare[T any](conf *confx.Server) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tk, err := c.Cookie(constx.KeyOfCookieToken)
 		if err != nil {
-			respx.Err(c, errx.InvalidToken)
+			respx.ErrAuth(c, errx.InvalidToken)
 			return
 		}
 
 		uid1, err := c.Cookie(constx.KeyOfCookieUserId)
 		if err != nil {
-			respx.Err(c, errx.InvalidToken)
+			respx.ErrAuth(c, errx.InvalidToken)
 			return
 		}
 
 		uid2, err := securex.ParseToken(tk, conf.EncryptSecret, int64(conf.CookieExpiredSeconds))
 		if err != nil {
-			respx.Err(c, errx.InvalidToken.AddErr(err))
+			respx.ErrAuth(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
 		if uid1 != uid2 {
-			respx.Err(c, errx.InvalidToken.AddErr(err))
+			respx.ErrAuth(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
 		existsUser, err := dbx.QueryOneByPk[T](uid2)
 		if err != nil {
-			respx.Err(c, errx.UserNotFound.AddErr(err))
+			respx.ErrAuth(c, errx.UserNotFound.AddErr(err))
 			return
 		}
 		SetRequestUser(c, existsUser, uid2)
