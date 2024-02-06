@@ -87,6 +87,34 @@ func QueryManyHandler[T any](options ...dbx.QueryOption) gin.HandlerFunc {
 	}
 }
 
+func QueryOneToManyHandler[P any, T any](relationField string, options ...dbx.QueryOption) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		opt, err := initOption(c, options...)
+		if err != nil {
+			respx.Err(c, errx.InvalidParams.AddErr(err))
+			return
+		}
+
+		_, err = dbx.QueryOneByPk[P](c.Param(dbx.Opt.ModelPrimaryKey))
+		if err != nil {
+			respx.Err(c, errx.QueryDataFailed.AddErr(err))
+			return
+		}
+		opt.Where[relationField] = c.Param(dbx.Opt.ModelPrimaryKey)
+
+		var result any
+		if opt.NoPaging {
+			result, err = dbx.QueryAll[T](&opt) // 不分页
+		} else {
+			result, err = dbx.QueryPage[T](&opt) // 分页
+		}
+		if err != nil {
+			respx.Err(c, errx.QueryDataFailed.AddErr(err))
+			return
+		}
+		respx.OK(c, result)
+	}
+}
 func QueryAssociationHandler[P any, T any](field string, options ...dbx.QueryOption) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		opt, err := initOption(c, options...)
@@ -112,6 +140,5 @@ func QueryAssociationHandler[P any, T any](field string, options ...dbx.QueryOpt
 			return
 		}
 		respx.OK(c, result)
-
 	}
 }

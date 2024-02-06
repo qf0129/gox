@@ -17,7 +17,7 @@ type CreateManyOption struct {
 func CreateManyHandler[T any](options ...CreateManyOption) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// 请求json转map数组
-		mapList := []map[string]any{}
+		var mapList []map[string]any
 		if err := c.ShouldBindJSON(&mapList); err != nil {
 			respx.Err(c, errx.InvalidParams.AddErr(err))
 			return
