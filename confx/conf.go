@@ -65,4 +65,5 @@ func ReadJsonConfig(target any) {
 	if err != nil {
 		panic("UnmarshalConfigFailed: " + err.Error())
 	}
+	slog.Info("Read config file success!")
 }

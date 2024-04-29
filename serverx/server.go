@@ -21,6 +21,9 @@ func Run(server *http.Server) {
 	if server.WriteTimeout == 0 {
 		server.WriteTimeout = constx.DefaultWriteTimeout * time.Second
 	}
-	slog.Info("### server is listening " + server.Addr)
-	server.ListenAndServe()
+	if err := server.ListenAndServe(); err != nil {
+		slog.Error(err.Error())
+	} else {
+		slog.Info("### server is listening " + server.Addr)
+	}
 }
