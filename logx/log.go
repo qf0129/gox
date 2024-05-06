@@ -3,9 +3,30 @@ package logx
 import (
 	"context"
 	"log/slog"
+	"os"
 )
 
 var logger = slog.Default()
+
+func GetLogger() *slog.Logger {
+	return logger
+}
+
+func SetJsonLogger() {
+	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, nil)))
+}
+
+func SetTextLogger() {
+	slog.SetDefault(slog.New(slog.NewTextHandler(os.Stdout, nil)))
+}
+
+func NewTextFileLogger(filepath string) *slog.Logger {
+	f, err := os.OpenFile(filepath, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	if err != nil {
+		logger.Error("CreateLogFileError", "err", err)
+	}
+	return slog.New(slog.NewTextHandler(f, nil))
+}
 
 func Debug(msg string, args ...any) {
 	logger.Debug(msg, args...)
