@@ -16,10 +16,16 @@ var (
 	InvalidJsonParams = &Err{Code: 100202, Msg: "无效的JSON参数"}
 	InvalidPathParams = &Err{Code: 100203, Msg: "无效的路径参数"}
 	InvalidHeader     = &Err{Code: 100204, Msg: "无效的请求头"}
+	InvalidBody       = &Err{Code: 100205, Msg: "无效的请求体"}
 
 	ValidateParamFailed = &Err{Code: 100211, Msg: "校验参数失败"}
 	ParseParamFailed    = &Err{Code: 100212, Msg: "解析参数失败"}
 	NoPermission        = &Err{Code: 100213, Msg: "没有权限"}
+
+	FileNotExist    = &Err{Code: 100301, Msg: "文件不存在"}
+	FileDirNotExist = &Err{Code: 100302, Msg: "目录不存在"}
+	FileReadFailed  = &Err{Code: 100303, Msg: "文件读取失败"}
+	FileWriteFailed = &Err{Code: 100304, Msg: "文件写入失败"}
 
 	AuthFailed        = &Err{Code: 100401, Msg: "认证失败"}
 	InvalidToken      = &Err{Code: 100402, Msg: "无效的令牌"}
