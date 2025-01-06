@@ -2,48 +2,53 @@ package httpx
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"net"
 	"net/http"
 	netUrl "net/url"
+	"os"
 
 	"github.com/qf0129/gox/logx"
+	"golang.org/x/net/proxy"
 )
 
-// https://deeplx.owo.network/endpoints/free.html
-type DeeplReq struct {
-	Text       string `json:"text"`
-	SourceLang string `json:"source_lang"`
-	TargetLang string `json:"target_lang"`
-}
-
 func Get[T any](url string, headers, params map[string]string) (*T, error) {
-	return Request[T](http.MethodGet, url, headers, params, nil)
+	return Request[T](http.MethodGet, url, headers, params, nil, "")
 }
 
 func Post[T any](url string, headers map[string]string, body any) (*T, error) {
-	return Request[T](http.MethodPost, url, headers, nil, body)
+	return Request[T](http.MethodPost, url, headers, nil, body, "")
 }
-
 func Put[T any](url string, headers map[string]string, body any) (*T, error) {
-	return Request[T](http.MethodPut, url, headers, nil, body)
+	return Request[T](http.MethodPut, url, headers, nil, body, "")
 }
 
 func Delete[T any](url string, headers map[string]string, body any) (*T, error) {
-	return Request[T](http.MethodDelete, url, headers, nil, body)
+	return Request[T](http.MethodDelete, url, headers, nil, body, "")
 }
 
 func Head[T any](url string, headers, params map[string]string) (*T, error) {
-	return Request[T](http.MethodHead, url, headers, params, nil)
+	return Request[T](http.MethodHead, url, headers, params, nil, "")
 }
 
 func Options[T any](url string, headers, params map[string]string) (*T, error) {
-	return Request[T](http.MethodOptions, url, headers, params, nil)
+	return Request[T](http.MethodOptions, url, headers, params, nil, "")
 }
 
-func Request[T any](method, url string, headers, params map[string]string, body any) (*T, error) {
-	logx.Debug("HttpRequestStart", "method", method, "url", url, "params", params, "headers", headers, "body", body)
+func GetWithProxy[T any](url string, headers, params map[string]string, socks5Proxy string) (*T, error) {
+	return Request[T](http.MethodGet, url, headers, params, nil, socks5Proxy)
+}
+
+func PostWithProxy[T any](url string, headers map[string]string, body any, socks5Proxy string) (*T, error) {
+	return Request[T](http.MethodPost, url, headers, nil, body, socks5Proxy)
+}
+
+func Request[T any](method, url string, headers, params map[string]string, body any, socks5Proxy string) (*T, error) {
+	logx.Info("HttpRequestStart", "method", method, "url", url, "params", params, "headers", headers, "body", body)
 	if len(params) > 0 {
 		urlValues := netUrl.Values{}
 		for k, v := range params {
@@ -79,6 +84,20 @@ func Request[T any](method, url string, headers, params map[string]string, body 
 	}
 
 	client := &http.Client{}
+	if socks5Proxy != "" {
+		dialer, err := proxy.SOCKS5("tcp", socks5Proxy, nil, proxy.Direct)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "can't connect to the proxy:", err)
+			return nil, errors.New("RequestDeeplError, " + err.Error())
+		}
+
+		httpTransport := &http.Transport{}
+		httpTransport.DialContext = func(ctx context.Context, network, address string) (net.Conn, error) {
+			return dialer.Dial(network, address)
+		}
+		client.Transport = httpTransport
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, errors.New("SendRequestError, " + err.Error())
@@ -90,6 +109,7 @@ func Request[T any](method, url string, headers, params map[string]string, body 
 		return nil, errors.New("ReadResponseError, " + err.Error())
 	}
 	logx.Info("HttpReponse", "status", resp.Status)
+	logx.Info("HttpReponse", "response", string(respBody))
 	if resp.StatusCode != http.StatusOK {
 		return nil, errors.New("HttpRequestError, resp=" + string(respBody))
 	}
