@@ -29,7 +29,7 @@ func DeleteHandler[T any]() ginx.HandlerFunc {
 				return nil, errx.QueryDataFailed.AddErr(err).AddMsg("id=" + id)
 			}
 			if !exists {
-				return nil, errx.InvalidParams.AddMsg(id + "不存在")
+				return nil, errx.DeleteDataFailed.AddMsg(id + "不存在")
 			}
 			if err := dbx.DeleteByPk[T](id); err != nil {
 				return nil, errx.DeleteDataFailed.AddErr(err).AddMsg("id=" + id)
