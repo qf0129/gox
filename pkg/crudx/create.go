@@ -14,11 +14,9 @@ import (
 
 type CustomFieldFunc func(c *gin.Context, input map[string]any) any
 
-// 查询选项
 type CreateHandlerOption struct {
 	CustomFields map[string]CustomFieldFunc
-	PrimaryKey   string
-	// PathParamsMap map[string]string
+	AfterHook    func(c *gin.Context, id any)
 }
 
 func CreateHandler[T any](options ...CreateHandlerOption) ginx.HandlerFunc {
@@ -37,7 +35,7 @@ func CreateHandler[T any](options ...CreateHandlerOption) ginx.HandlerFunc {
 		case map[string]any: // 创建单个
 			return createOne[T](c, jsonData, opt)
 		case []any: // 创建多个
-			ids := make([]string, 0)
+			ids := make([]any, 0)
 			for _, item := range jsonData.([]any) {
 				id, err := createOne[T](c, item, opt)
 				if err != nil {
@@ -52,15 +50,13 @@ func CreateHandler[T any](options ...CreateHandlerOption) ginx.HandlerFunc {
 	}
 }
 
-func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (string, errx.Err) {
+func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (any, errx.Err) {
 	if reflect.TypeOf(itemData).Kind() != reflect.Map {
 		return "", errx.InvalidJsonParams.AddMsg(fmt.Sprintf("不支持的类型: %v", reflect.TypeOf(itemData)))
 	}
 
 	itemMap := itemData.(map[string]any)
-
 	if opt != nil {
-		// 自定义参数取值
 		if opt.CustomFields != nil {
 			for field, fieldFunc := range opt.CustomFields {
 				itemMap[field] = fieldFunc(c, itemMap)
@@ -72,19 +68,13 @@ func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (s
 	if err != nil {
 		return "", errx.PraseJsonError.AddErr(err)
 	}
-
 	if err := dbx.Create(target); err != nil {
 		return "", errx.CreateDataFailed.AddErr(err)
 	}
 
-	pk := "Id"
-	if opt != nil && opt.PrimaryKey != "" {
-		pk = opt.PrimaryKey
+	targetId := reflectx.StructGet(target, "Id")
+	if opt != nil && opt.AfterHook != nil {
+		opt.AfterHook(c, targetId)
 	}
-
-	idData := reflectx.GetVal(target, pk)
-	if idData == nil {
-		return "", errx.RequestFailed.AddMsgf("目标对象没有%s字段", pk)
-	}
-	return idData.(string), nil
+	return targetId, nil
 }

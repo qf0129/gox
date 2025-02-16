@@ -7,22 +7,21 @@ import (
 	"github.com/qf0129/gox/pkg/ginx"
 )
 
-type UpdateOption struct {
+type UpdateHandlerOption struct {
 	UpdateFields []string
+	AfterHook    func(c *gin.Context, id any)
 }
 
 type reqUpdateHandler[T any] struct {
-	Id   string `binding:"required"`
-	Data T
+	Id   any `binding:"required"`
+	Data T   `binding:"required"`
 }
 
-func UpdateHandler[T any](options ...UpdateOption) ginx.HandlerFunc {
+func UpdateHandler[T any](options ...UpdateHandlerOption) ginx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
-		var opt UpdateOption
+		var opt *UpdateHandlerOption
 		if len(options) > 0 {
-			opt = options[0]
-		} else {
-			opt = UpdateOption{}
+			opt = &options[0]
 		}
 
 		req := &reqUpdateHandler[T]{}
@@ -30,19 +29,23 @@ func UpdateHandler[T any](options ...UpdateOption) ginx.HandlerFunc {
 			return nil, errx.InvalidJsonParams.AddErr(err)
 		}
 
-		_, err := dbx.QueryOneByPk[T](req.Id)
+		target, err := dbx.QueryOneByPk[T](req.Id)
 		if err != nil {
-			return nil, errx.QueryDataFailed.AddErr(err)
+			return nil, errx.QueryDataFailed.AddErr(err).AddMsgf("id=%s", req.Id)
 		}
 
-		if len(opt.UpdateFields) > 0 {
-			if err := dbx.UpdateOneFiledsByPk(req.Id, req.Data, opt.UpdateFields); err != nil {
+		if opt != nil && len(opt.UpdateFields) > 0 {
+			if err := dbx.UpdateTargetFileds(target, req.Data, opt.UpdateFields); err != nil {
 				return nil, errx.UpdateDataFailed.AddErr(err)
 			}
 		} else {
-			if err := dbx.UpdateOneByPk(req.Id, req.Data); err != nil {
+			if err := dbx.UpdateTarget(target, req.Data); err != nil {
 				return nil, errx.UpdateDataFailed.AddErr(err)
 			}
+		}
+
+		if opt != nil && opt.AfterHook != nil {
+			opt.AfterHook(c, req.Id)
 		}
 		return req.Id, nil
 	}

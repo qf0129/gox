@@ -8,33 +8,40 @@ import (
 )
 
 type reqDeleteHandler struct {
-	Ids []string `binding:"required"`
+	Ids []any `binding:"required"`
 }
 
-func DeleteHandler[T any]() ginx.HandlerFunc {
+type DeleteHandlerOption struct {
+	AfterHook func(c *gin.Context, id any)
+}
+
+func DeleteHandler[T any](options ...DeleteHandlerOption) ginx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
 		var req reqDeleteHandler
 		if err := c.ShouldBindJSON(&req); err != nil {
 			return nil, errx.InvalidJsonParams.AddErr(err)
 		}
 
+		var opt *DeleteHandlerOption
+		if len(options) > 0 {
+			opt = &options[0]
+		}
+
 		if len(req.Ids) == 0 {
 			return nil, errx.InvalidParams.AddMsg("Ids不能为空")
 		}
 
-		deletedIds := []string{}
+		deletedIds := []any{}
 		for _, id := range req.Ids {
-			exists, err := dbx.ExistByPk[T](id)
-			if err != nil {
-				return nil, errx.QueryDataFailed.AddErr(err).AddMsg("id=" + id)
-			}
-			if !exists {
-				return nil, errx.DeleteDataFailed.AddMsg(id + "不存在")
+			if exists, _ := dbx.ExistByPk[T](id); !exists {
+				return nil, errx.TargetNotExists.AddMsgf("id=%s", id)
 			}
 			if err := dbx.DeleteByPk[T](id); err != nil {
-				return nil, errx.DeleteDataFailed.AddErr(err).AddMsg("id=" + id)
-			} else {
-				deletedIds = append(deletedIds, id)
+				return nil, errx.DeleteDataFailed.AddErr(err).AddMsgf("id=%s", id)
+			}
+			deletedIds = append(deletedIds, id)
+			if opt != nil && opt.AfterHook != nil {
+				opt.AfterHook(c, id)
 			}
 		}
 		return deletedIds, nil

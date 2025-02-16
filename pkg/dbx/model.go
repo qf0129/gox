@@ -7,16 +7,16 @@ import (
 )
 
 type BaseModel struct {
-	Id    int64          `gorm:"primaryKey" json:"-"`
+	Id    int64          `gorm:"primaryKey"`
 	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime(3)"`
-	Utime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
+	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
 	Dtime gorm.DeletedAt `gorm:"index;type:datetime(3)" json:"-"`
 }
 
 type BaseUidModel struct {
 	Id    string         `gorm:"primaryKey;type:varchar(64)"`
 	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime(3)"`
-	Utime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
+	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
 	Dtime gorm.DeletedAt `gorm:"index;type:datetime(3)" json:"-"`
 }
 

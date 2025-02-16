@@ -1,10 +1,10 @@
 package dbx
 
-func DeleteTarget[T any](target T) error {
+func Delete(target any) error {
 	return DB.Delete(target).Error
 }
 
-func DeleteTargets[T any](targets []T) error {
+func DeleteMany(targets []any) error {
 	return DB.Delete(targets).Error
 }
 
