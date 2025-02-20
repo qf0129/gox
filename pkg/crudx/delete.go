@@ -34,10 +34,10 @@ func DeleteHandler[T any](options ...DeleteHandlerOption) ginx.HandlerFunc {
 		deletedIds := []any{}
 		for _, id := range req.Ids {
 			if exists, _ := dbx.ExistByPk[T](id); !exists {
-				return nil, errx.TargetNotExists.AddMsgf("id=%s", id)
+				return nil, errx.TargetNotExists.AddMsgf("id=%v", id)
 			}
 			if err := dbx.DeleteByPk[T](id); err != nil {
-				return nil, errx.DeleteDataFailed.AddErr(err).AddMsgf("id=%s", id)
+				return nil, errx.DeleteDataFailed.AddErr(err).AddMsgf("id=%v", id)
 			}
 			deletedIds = append(deletedIds, id)
 			if opt != nil && opt.AfterHook != nil {

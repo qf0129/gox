@@ -31,7 +31,7 @@ func UpdateHandler[T any](options ...UpdateHandlerOption) ginx.HandlerFunc {
 
 		target, err := dbx.QueryOneByPk[T](req.Id)
 		if err != nil {
-			return nil, errx.QueryDataFailed.AddErr(err).AddMsgf("id=%s", req.Id)
+			return nil, errx.QueryDataFailed.AddErr(err).AddMsgf("id=%v", req.Id)
 		}
 
 		if opt != nil && len(opt.UpdateFields) > 0 {
