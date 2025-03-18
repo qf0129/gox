@@ -3,7 +3,6 @@ module github.com/qf0129/gox
 go 1.21.0
 
 require (
-	github.com/bytedance/sonic v1.10.2
 	github.com/deckarep/golang-set/v2 v2.6.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/glebarez/sqlite v1.10.0
@@ -17,6 +16,7 @@ require (
 )
 
 require (
+	github.com/bytedance/sonic v1.10.0-rc // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
 	github.com/chenzhuoyu/iasm v0.9.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect

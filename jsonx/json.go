@@ -1,9 +1,8 @@
 package jsonx
 
-import "github.com/bytedance/sonic"
+import "encoding/json"
 
 var (
-	json          = sonic.ConfigFastest
 	Marshal       = json.Marshal
 	Unmarshal     = json.Unmarshal
 	MarshalIndent = json.MarshalIndent
