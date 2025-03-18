@@ -1,7 +1,11 @@
 package dbx
 
-func Update(obj any) error {
-	return DB.Save(obj).Error
+func Update(target any) error {
+	return DB.Save(target).Error
+}
+
+func UpdateFileds(target any, fields []string) error {
+	return DB.Model(target).Select(fields).Updates(target).Error
 }
 
 func UpdateTarget(target any, val any) error {

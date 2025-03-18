@@ -38,6 +38,10 @@ type App struct {
 }
 
 func (app *App) AddGroup(groups ...*ApiGroup) *App {
+	return app.AddGroups(groups)
+}
+
+func (app *App) AddGroups(groups []*ApiGroup) *App {
 	app.ApiGroups = append(app.ApiGroups, groups...)
 	return app
 }

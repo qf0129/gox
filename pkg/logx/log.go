@@ -2,6 +2,7 @@ package logx
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 )
@@ -40,6 +41,10 @@ func Info(msg string, args ...any) {
 	logger.Info(msg, args...)
 }
 
+func Infof(msg string, args ...any) {
+	logger.Info(fmt.Sprintf(msg, args...))
+}
+
 func InfoContext(ctx context.Context, msg string, args ...any) {
 	logger.InfoContext(ctx, msg, args...)
 }
@@ -48,12 +53,20 @@ func Warn(msg string, args ...any) {
 	logger.Warn(msg, args...)
 }
 
+func Warnf(msg string, args ...any) {
+	logger.Warn(fmt.Sprintf(msg, args...))
+}
+
 func WarnContext(ctx context.Context, msg string, args ...any) {
 	logger.WarnContext(ctx, msg, args...)
 }
 
 func Error(msg string, args ...any) {
 	logger.Error(msg, args...)
+}
+
+func Errorf(msg string, args ...any) {
+	logger.Error(fmt.Sprintf(msg, args...))
 }
 
 func ErrorContext(ctx context.Context, msg string, args ...any) {

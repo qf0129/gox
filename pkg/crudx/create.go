@@ -5,18 +5,18 @@ import (
 	"reflect"
 
 	"github.com/gin-gonic/gin"
+	"github.com/qf0129/gox/pkg/convertx"
 	"github.com/qf0129/gox/pkg/dbx"
 	"github.com/qf0129/gox/pkg/errx"
 	"github.com/qf0129/gox/pkg/ginx"
 	"github.com/qf0129/gox/pkg/reflectx"
-	"github.com/qf0129/gox/pkg/structx"
 )
 
 type CustomFieldFunc func(c *gin.Context, input map[string]any) any
 
 type CreateHandlerOption struct {
 	CustomFields map[string]CustomFieldFunc
-	AfterHook    func(c *gin.Context, id any)
+	AfterHook    func(c *gin.Context, id any) error
 }
 
 func CreateHandler[T any](options ...CreateHandlerOption) ginx.HandlerFunc {
@@ -64,7 +64,7 @@ func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (a
 		}
 	}
 
-	target, err := structx.MapToStruct[T](itemMap)
+	target, err := convertx.MapToStruct[T](itemMap)
 	if err != nil {
 		return "", errx.PraseJsonError.AddErr(err)
 	}
@@ -74,7 +74,9 @@ func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (a
 
 	targetId := reflectx.StructGet(target, "Id")
 	if opt != nil && opt.AfterHook != nil {
-		opt.AfterHook(c, targetId)
+		if err := opt.AfterHook(c, targetId); err != nil {
+			return "", errx.CreateDataFailed.AddErr(err)
+		}
 	}
 	return targetId, nil
 }

@@ -39,7 +39,7 @@ func (t *Time) Scan(v interface{}) error {
 		*t = Time(value)
 		return nil
 	}
-	return fmt.Errorf("can not convert %v to modelx.Time", v)
+	return fmt.Errorf("can not convert %v to timex.Time", v)
 }
 
 func (t *Time) String() string {

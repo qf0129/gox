@@ -51,3 +51,12 @@ func IsNumeric(s string) bool {
 	}
 	return false
 }
+
+// 正则匹配是否为整数
+func IsDigit(b string) bool {
+	return IsDigitBytes([]byte(b))
+}
+
+func IsDigitBytes(b []byte) bool {
+	return regexp.MustCompile(`^[0-9]+$`).Match(b)
+}
