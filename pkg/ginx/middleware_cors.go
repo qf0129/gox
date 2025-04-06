@@ -1,4 +1,4 @@
-package middlewarex
+package ginx
 
 import (
 	"net/http"

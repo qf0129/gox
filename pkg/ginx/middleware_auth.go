@@ -1,10 +1,9 @@
-package middlewarex
+package ginx
 
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/pkg/dbx"
 	"github.com/qf0129/gox/pkg/errx"
-	"github.com/qf0129/gox/pkg/ginx"
 	"github.com/qf0129/gox/pkg/securex"
 )
 
@@ -34,30 +33,30 @@ func MiddileWareCheckToken[T any](encryptSecret string, cookieExpiredSeconds int
 	return func(c *gin.Context) {
 		tk, err := c.Cookie(KeyOfCookieToken)
 		if err != nil {
-			ginx.ResponseFailed(c, errx.InvalidToken)
+			ResponseFailed(c, errx.InvalidToken)
 			return
 		}
 
 		uid1, err := c.Cookie(KeyOfCookieUserId)
 		if err != nil {
-			ginx.ResponseFailed(c, errx.InvalidToken)
+			ResponseFailed(c, errx.InvalidToken)
 			return
 		}
 
 		uid2, err := securex.ParseToken(tk, encryptSecret, cookieExpiredSeconds)
 		if err != nil {
-			ginx.ResponseFailed(c, errx.InvalidToken.AddErr(err))
+			ResponseFailed(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
 		if uid1 != uid2 {
-			ginx.ResponseFailed(c, errx.InvalidToken.AddErr(err))
+			ResponseFailed(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
 		existsUser, err := dbx.QueryOneByPk[T](uid2)
 		if err != nil {
-			ginx.ResponseFailed(c, errx.UserNotFound.AddErr(err))
+			ResponseFailed(c, errx.UserNotFound.AddErr(err))
 			return
 		}
 		SetRequestUser(c, existsUser, uid2)

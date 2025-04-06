@@ -19,10 +19,9 @@ type Config struct {
 	EnableCheckHealthApi bool
 	CheckHealthApiPath   string
 	EnableRequestId      bool
-	// DBLogLevel           string // error,warn,info
-	// EncryptSecret        string
-	// CookieDomain         string
-	// CookieExpiredSeconds int
+	EncryptSecret        string
+	CookieDomain         string
+	CookieExpiredSeconds int
 }
 
 func loadDefaultConfig(cfg *Config) *Config {
