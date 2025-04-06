@@ -29,7 +29,7 @@ func GetRequestUser[T any](c *gin.Context) T {
 	return user.(T)
 }
 
-func MiddileWareCheckToken[T any](encryptSecret string, cookieExpiredSeconds int64) gin.HandlerFunc {
+func MiddileWareCheckToken[T any](encryptSecret string, cookieExpiredSeconds int) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tk, err := c.Cookie(KeyOfCookieToken)
 		if err != nil {
@@ -43,7 +43,7 @@ func MiddileWareCheckToken[T any](encryptSecret string, cookieExpiredSeconds int
 			return
 		}
 
-		uid2, err := securex.ParseToken(tk, encryptSecret, cookieExpiredSeconds)
+		uid2, err := securex.ParseToken(tk, encryptSecret, int64(cookieExpiredSeconds))
 		if err != nil {
 			ResponseFailed(c, errx.InvalidToken.AddErr(err))
 			return
