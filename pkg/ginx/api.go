@@ -15,6 +15,7 @@ type Api struct {
 	Type        string
 	Description string
 	Handler     HandlerFunc
+	GinHandler  gin.HandlerFunc
 }
 type HandlerFunc func(c *gin.Context) (interface{}, errx.Err)
 

@@ -73,7 +73,11 @@ func (app *App) Run() {
 			ginGroup.Use(apiGroup.Middlewares...)
 			for _, api := range apiGroup.Apis {
 				api.loadDefaut()
-				ginGroup.Handle(api.Method, api.Path, api.handle(app.Config.EnableRequestId))
+				if api.GinHandler != nil {
+					ginGroup.Handle(api.Method, api.Path, api.GinHandler)
+				} else {
+					ginGroup.Handle(api.Method, api.Path, api.handle(app.Config.EnableRequestId))
+				}
 			}
 		}
 	}
