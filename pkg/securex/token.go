@@ -3,6 +3,7 @@ package securex
 import (
 	"encoding/binary"
 	"errors"
+	"log"
 	"time"
 )
 
@@ -15,7 +16,12 @@ func CreateToken(body string, secretKey string) (string, error) {
 	for i, v := range body {
 		tokenByte[i+8] = byte(v)
 	}
-
+	if len(secretKey) == 0 {
+		secretKey = "DEFAULTSECRETKEY"
+	}
+	if len(secretKey) != 16 {
+		log.Fatalf("EncryptSecret Key must be 16 bytes")
+	}
 	return Encrypt(tokenByte, []byte(secretKey))
 }
 

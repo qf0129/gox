@@ -1,4 +1,4 @@
-package ginx
+package serverx
 
 import (
 	"net/http"
@@ -7,28 +7,27 @@ import (
 	"github.com/qf0129/gox/pkg/errx"
 )
 
-type Api struct {
-	Module      string
+type ApiInfo struct {
 	Method      string
-	Name        string
 	Path        string
+	Handler     HandlerFunc
+	Module      string
+	Name        string
 	Type        string
 	Description string
-	Handler     HandlerFunc
 	GinHandler  gin.HandlerFunc
 }
 type HandlerFunc func(c *gin.Context) (interface{}, errx.Err)
 
-func NewApi(name string, method string, path string, handler HandlerFunc) Api {
-	return Api{
-		Name:    name,
+func Api(method string, path string, handler HandlerFunc) *ApiInfo {
+	return &ApiInfo{
 		Method:  method,
 		Path:    path,
 		Handler: handler,
 	}
 }
 
-func (api *Api) loadDefaut() *Api {
+func (api *ApiInfo) loadDefaut() *ApiInfo {
 	if api.Method == "" {
 		api.Method = "GET"
 	}
@@ -41,10 +40,10 @@ func (api *Api) loadDefaut() *Api {
 	return api
 }
 
-func (api *Api) handle(enableRequestId bool) gin.HandlerFunc {
+func (api *ApiInfo) handle(app *App) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		reqId := ""
-		if enableRequestId {
+		if app.Config.EnableRequestId {
 			reqId = ctx.GetString(KeyOfRequestId)
 		}
 		rsp, err := api.Handler(ctx)

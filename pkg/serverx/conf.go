@@ -1,4 +1,4 @@
-package ginx
+package serverx
 
 import "github.com/gin-gonic/gin"
 

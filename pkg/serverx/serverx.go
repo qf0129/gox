@@ -1,6 +1,7 @@
-package ginx
+package serverx
 
 import (
+	"log"
 	"log/slog"
 	"net/http"
 	"time"
@@ -23,18 +24,22 @@ func NewApp(cfgs ...*Config) *App {
 		})
 	}
 	app := &App{
-		GinEngine: ginEngine,
+		Engine:    ginEngine,
 		Config:    cfg,
-		ApiGroups: []*ApiGroup{NewApiGroup("default", "/")},
+		ApiGroups: []*ApiGroup{{Path: "/", Name: "default"}},
 	}
 	return app
 }
 
 type App struct {
-	GinEngine   *gin.Engine
+	Engine      *gin.Engine
 	Config      *Config
 	ApiGroups   []*ApiGroup
 	Middlewares []gin.HandlerFunc
+}
+
+func (app *App) UseCORS() *App {
+	return app.Use(MiddlewareCORS())
 }
 
 func (app *App) AddGroup(groups ...*ApiGroup) *App {
@@ -46,11 +51,11 @@ func (app *App) AddGroups(groups []*ApiGroup) *App {
 	return app
 }
 
-func (app *App) AddApi(apis ...*Api) *App {
+func (app *App) AddApi(apis ...*ApiInfo) *App {
 	if len(app.ApiGroups) == 0 {
 		app.addDefaultGroup()
 	}
-	app.ApiGroups[0].AddApi(apis...)
+	app.ApiGroups[0].Add(apis...)
 	return app
 }
 
@@ -65,18 +70,21 @@ func (app *App) Use(middlewares ...gin.HandlerFunc) *App {
 func (app *App) Run() {
 	for _, apiGroup := range app.ApiGroups {
 		if len(apiGroup.Apis) > 0 {
-			ginGroup := app.GinEngine.Group(apiGroup.Path)
+			ginGroup := app.Engine.Group(apiGroup.Path)
 			if app.Config.EnableRequestId {
 				ginGroup.Use(func(c *gin.Context) { c.Set(KeyOfRequestId, xid.New().String()) })
 			}
-			ginGroup.Use(app.Middlewares...)
+			// ginGroup.Use(app.Middlewares...)
 			ginGroup.Use(apiGroup.Middlewares...)
 			for _, api := range apiGroup.Apis {
 				api.loadDefaut()
 				if api.GinHandler != nil {
 					ginGroup.Handle(api.Method, api.Path, api.GinHandler)
 				} else {
-					ginGroup.Handle(api.Method, api.Path, api.handle(app.Config.EnableRequestId))
+					if api.Handler == nil {
+						log.Fatalf("api \"%s\" handler is nil", api.Path)
+					}
+					ginGroup.Handle(api.Method, api.Path, api.handle(app))
 				}
 			}
 		}
@@ -86,8 +94,9 @@ func (app *App) Run() {
 
 func (app *App) runServer() {
 	slog.Info("### Server listening on " + app.Config.Addr)
+	app.Engine.Use(app.Middlewares...)
 	server := &http.Server{
-		Handler:      app.GinEngine,
+		Handler:      app.Engine,
 		Addr:         app.Config.Addr,
 		ReadTimeout:  time.Duration(app.Config.ReadTimeout) * time.Second,
 		WriteTimeout: time.Duration(app.Config.WriteTimeout) * time.Second,
@@ -98,5 +107,5 @@ func (app *App) runServer() {
 }
 
 func (app *App) addDefaultGroup() {
-	app.ApiGroups = append(app.ApiGroups, NewApiGroup("default", "/"))
+	app.ApiGroups = append(app.ApiGroups, &ApiGroup{Path: "/", Name: "default"})
 }

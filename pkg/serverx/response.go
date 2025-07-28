@@ -1,4 +1,4 @@
-package ginx
+package serverx
 
 import (
 	"net/http"
@@ -28,6 +28,6 @@ func ResponseOK(c *gin.Context, data interface{}) {
 	Response(c, http.StatusOK, 0, "", data, "")
 }
 
-func ResponseFailed(c *gin.Context, err errx.Err) {
+func ResponseErr(c *gin.Context, err errx.Err) {
 	Response(c, http.StatusOK, err.Code(), err.Msg(), nil, "")
 }
