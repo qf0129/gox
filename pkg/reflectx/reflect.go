@@ -2,6 +2,14 @@ package reflectx
 
 import "reflect"
 
+func GetTypeKind(v any) reflect.Kind {
+	return reflect.TypeOf(v).Kind()
+}
+
+func IsSlice(v any) bool {
+	return GetTypeKind(v) == reflect.Slice
+}
+
 func StructHas(s any, field string) bool {
 	v := reflect.ValueOf(s)
 	if v.Kind() == reflect.Ptr {

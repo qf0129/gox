@@ -46,34 +46,39 @@ const (
 	DefaultPageSize        = 10
 )
 
-func ConnectDB(opt *DBOption) {
-	loadDefaultDbOption(opt)
-	Option = opt
+func Connect(opts ...*DBOption) {
+	Option = loadDefaultDbOption(opts)
 	var dbConn gorm.Dialector
-	if opt.Mysql != nil {
-		dbConn = mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			opt.Mysql.Username, opt.Mysql.Password,
-			opt.Mysql.Host, opt.Mysql.Port,
-			opt.Mysql.Database,
+	if Option.Mysql != nil {
+		dbConn = mysql.Open(fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=30s",
+			Option.Mysql.Username, Option.Mysql.Password,
+			Option.Mysql.Host, Option.Mysql.Port,
+			Option.Mysql.Database,
 		))
-		slog.Info("### Connected MySQL", slog.String("host", opt.Mysql.Host), slog.Int("port", opt.Mysql.Port), slog.String("user", opt.Mysql.Username), slog.String("db", opt.Mysql.Database))
+		slog.Info("### Connected MySQL", slog.String("host", Option.Mysql.Host), slog.Int("port", Option.Mysql.Port), slog.String("user", Option.Mysql.Username), slog.String("db", Option.Mysql.Database))
 	} else {
-		dbConn = sqlite.Open(opt.Sqlite.DBFile)
-		slog.Info("### Connected SQLite", slog.String("db", opt.Sqlite.DBFile))
+		dbConn = sqlite.Open(Option.Sqlite.DBFile)
+		slog.Info("### Connected SQLite", slog.String("db", Option.Sqlite.DBFile))
 	}
 	var err error
-	DB, err = gorm.Open(dbConn, opt.Gorm)
+	DB, err = gorm.Open(dbConn, Option.Gorm)
 	if err != nil {
 		panic("ConnectDatabaseFailed: " + err.Error())
 	}
-	if opt.MigrateModels != nil {
-		if err := DB.AutoMigrate(opt.MigrateModels...); err != nil {
+	if Option.MigrateModels != nil {
+		if err := DB.AutoMigrate(Option.MigrateModels...); err != nil {
 			panic("MigrateModelsErr:" + err.Error())
 		}
 	}
 }
 
-func loadDefaultDbOption(opt *DBOption) {
+func loadDefaultDbOption(opts []*DBOption) *DBOption {
+	var opt *DBOption
+	if len(opts) == 0 {
+		opt = &DBOption{}
+	} else {
+		opt = opts[0]
+	}
 	if opt.Mysql != nil {
 		if opt.Mysql.Host == "" {
 			opt.Mysql.Host = DefaultMysqlHost
@@ -109,4 +114,5 @@ func loadDefaultDbOption(opt *DBOption) {
 	if opt.DefaultPageSize == 0 {
 		opt.DefaultPageSize = DefaultPageSize
 	}
+	return opt
 }

@@ -14,7 +14,7 @@ type BaseModel struct {
 }
 
 type BaseUidModel struct {
-	Id    string         `gorm:"primaryKey;type:varchar(64)"`
+	Id    string         `gorm:"primaryKey;type:varchar(50)"`
 	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime(3)"`
 	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
 	Dtime gorm.DeletedAt `gorm:"index;type:datetime(3)" json:"-"`
@@ -23,6 +23,17 @@ type BaseUidModel struct {
 func (m *BaseUidModel) BeforeCreate(tx *gorm.DB) error {
 	if m.Id == "" {
 		m.Id = xid.New().String()
+	}
+	return nil
+}
+
+type BaseUid struct {
+	Uid string `gorm:"index;type:varchar(50)"`
+}
+
+func (m *BaseUid) BeforeCreate(tx *gorm.DB) error {
+	if m.Uid == "" {
+		m.Uid = xid.New().String()
 	}
 	return nil
 }
