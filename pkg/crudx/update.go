@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/pkg/dbx"
 	"github.com/qf0129/gox/pkg/errx"
-	"github.com/qf0129/gox/pkg/ginx"
+	"github.com/qf0129/gox/pkg/serverx"
 )
 
 type UpdateHandlerOption struct {
@@ -17,7 +17,7 @@ type reqUpdateHandler[T any] struct {
 	Data T   `binding:"required"`
 }
 
-func UpdateHandler[T any](options ...UpdateHandlerOption) ginx.HandlerFunc {
+func UpdateHandler[T any](options ...UpdateHandlerOption) serverx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
 		var opt *UpdateHandlerOption
 		if len(options) > 0 {

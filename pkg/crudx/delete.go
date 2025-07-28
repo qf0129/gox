@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/qf0129/gox/pkg/dbx"
 	"github.com/qf0129/gox/pkg/errx"
-	"github.com/qf0129/gox/pkg/ginx"
+	"github.com/qf0129/gox/pkg/serverx"
 )
 
 type reqDeleteHandler struct {
@@ -15,7 +15,7 @@ type DeleteHandlerOption struct {
 	AfterHook func(c *gin.Context, id any)
 }
 
-func DeleteHandler[T any](options ...DeleteHandlerOption) ginx.HandlerFunc {
+func DeleteHandler[T any](options ...DeleteHandlerOption) serverx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
 		var req reqDeleteHandler
 		if err := c.ShouldBindJSON(&req); err != nil {

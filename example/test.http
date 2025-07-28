@@ -1,0 +1,54 @@
+
+### C
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Model": "user",
+    "Method": "create",
+    "Create": [
+        {"Name": "test5", "Age": 55},
+        {"Name": "test6", "Age": 66}
+    ]
+}
+
+### R
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Model": "user",
+    "Method": "read",
+    "Select": ["ID", "Name", "age"]
+}
+
+### U
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Model": "user",
+    "Method": "update",
+    "Update": {"Age": "77"},
+    "Where": {"Age": [66]}
+}
+
+### D
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Model": "user",
+    "Method": "delete",
+    "Where": {"Age": [77]}
+}
+
+### C
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Model": "user",
+    "Method": "count",
+    "Where": {"Age": [22]}
+}

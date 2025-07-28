@@ -2,6 +2,7 @@ package convertx
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -64,6 +65,23 @@ func AnyToSlice(input any) ([]any, error) {
 	default:
 		return nil, fmt.Errorf("不支持将 %T 转换为切片类型", input)
 	}
+}
+
+func MakeAnyStuct(obj any) any {
+	typ := reflect.TypeOf(obj)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	return reflect.New(typ).Interface()
+}
+
+func MakeAnySlice(obj any) any {
+	typ := reflect.TypeOf(obj)
+	if typ.Kind() == reflect.Ptr {
+		typ = typ.Elem()
+	}
+	s := reflect.SliceOf(typ)
+	return reflect.New(s).Interface()
 }
 
 func AnyToString(input any) string {

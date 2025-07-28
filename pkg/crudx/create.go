@@ -8,8 +8,8 @@ import (
 	"github.com/qf0129/gox/pkg/convertx"
 	"github.com/qf0129/gox/pkg/dbx"
 	"github.com/qf0129/gox/pkg/errx"
-	"github.com/qf0129/gox/pkg/ginx"
 	"github.com/qf0129/gox/pkg/reflectx"
+	"github.com/qf0129/gox/pkg/serverx"
 )
 
 type CustomFieldFunc func(c *gin.Context, input map[string]any) any
@@ -19,7 +19,7 @@ type CreateHandlerOption struct {
 	AfterHook    func(c *gin.Context, id any) error
 }
 
-func CreateHandler[T any](options ...CreateHandlerOption) ginx.HandlerFunc {
+func CreateHandler[T any](options ...CreateHandlerOption) serverx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
 		var jsonData any
 		if err := c.BindJSON(&jsonData); err != nil {
