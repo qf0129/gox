@@ -9,19 +9,21 @@ import (
 
 type Time time.Time
 
+const format = "2006-01-02 15:04:05"
+
 func (t *Time) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
 		return nil
 	}
 	var err error
 	str := string(data)
-	t1, err := time.Parse("2006-01-02 15:04:05.000", strings.Trim(str, "\""))
+	t1, err := time.Parse(format, strings.Trim(str, "\""))
 	*t = Time(t1)
 	return err
 }
 
 func (t *Time) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%v\"", time.Time(*t).Format("2006-01-02 15:04:05.000"))), nil
+	return []byte(fmt.Sprintf("\"%v\"", time.Time(*t).Format(format))), nil
 }
 
 var zeroTime time.Time
@@ -31,7 +33,7 @@ func (t Time) Value() (driver.Value, error) {
 	if tTime.UnixNano() == zeroTime.UnixNano() {
 		return nil, nil
 	}
-	return tTime.Format("2006-01-02 15:04:05.000"), nil
+	return tTime.Format(format), nil
 }
 
 func (t *Time) Scan(v interface{}) error {

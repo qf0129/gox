@@ -8,16 +8,16 @@ import (
 
 type BaseModel struct {
 	Id    int64          `gorm:"primaryKey"`
-	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime(3)"`
-	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
-	Dtime gorm.DeletedAt `gorm:"index;type:datetime(3)" json:"-"`
+	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime"`
+	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime"`
+	Dtime gorm.DeletedAt `gorm:"index;type:datetime" json:"-"`
 }
 
 type BaseUidModel struct {
 	Id    string         `gorm:"primaryKey;type:varchar(50)"`
-	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime(3)"`
-	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime(3)"`
-	Dtime gorm.DeletedAt `gorm:"index;type:datetime(3)" json:"-"`
+	Ctime *timex.Time    `gorm:"autoCreateTime;type:datetime"`
+	Mtime *timex.Time    `gorm:"autoUpdateTime;type:datetime"`
+	Dtime gorm.DeletedAt `gorm:"index;type:datetime" json:"-"`
 }
 
 func (m *BaseUidModel) BeforeCreate(tx *gorm.DB) error {
