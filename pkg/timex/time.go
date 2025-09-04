@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/qf0129/gox/pkg/ptrx"
 )
 
 type Time time.Time
@@ -50,4 +52,12 @@ func (t *Time) String() string {
 
 func (t *Time) Time() time.Time {
 	return time.Time(*t)
+}
+
+func Now() Time {
+	return Time(time.Now())
+}
+
+func NowP() *Time {
+	return ptrx.Ptr(Now())
 }

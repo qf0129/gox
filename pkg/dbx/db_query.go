@@ -16,17 +16,10 @@ type PageBody[T any] struct {
 	Total    int64
 }
 
-type QueryBody struct {
-	Page     int    `json:"page_num" form:"page_num"`   // 页数, 默认1
-	PageSize int    `json:"page_size" form:"page_size"` // 每页数量, 默认10
-	NoPaging bool   `json:"no_paging" form:"no_paging"` // 关闭分页, 默认false
-	Preload  string `json:"preload" form:"preload"`     // 预加载关联表名, 若多个以英文逗号分隔
-}
-
 type QueryOption[T any] struct {
 	Select   []string         // 指定查询字段
-	Filter   map[string]any   // 简单查询条件
 	Model    *T               // 结构体查询条件
+	Filter   map[string]any   // 简单查询条件
 	Where    map[string]any   // 自定义复杂查询条件
 	Preload  map[string][]any // 预加载关联查询
 	OrderBy  string           // 排序, eg: "create_time desc, update_time"

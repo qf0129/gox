@@ -7,6 +7,7 @@ import (
 // common
 var (
 	Success            = New(0, "ok")
+	Empty              = New(400001, "")
 	RequestFailed      = New(400100, "请求失败")
 	InvalidParams      = New(400101, "无效的参数")
 	InvalidJsonParams  = New(400102, "无效的JSON参数")
@@ -75,6 +76,10 @@ func (e *err) String() string {
 
 func (e *err) AddMsg(msg string) Err {
 	return New(e.code, fmt.Sprintf("%s[%s]", e.msg, msg))
+}
+
+func (e *err) AppendMsg(msg string) Err {
+	return New(e.code, fmt.Sprintf("%s, %s", e.msg, msg))
 }
 
 func (e *err) AddMsgf(format string, args ...any) Err {

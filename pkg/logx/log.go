@@ -33,6 +33,10 @@ func Debug(msg string, args ...any) {
 	logger.Debug(msg, args...)
 }
 
+func Debugf(msg string, args ...any) {
+	logger.Debug(fmt.Sprintf(msg, args...))
+}
+
 func DebugContext(ctx context.Context, msg string, args ...any) {
 	logger.DebugContext(ctx, msg, args...)
 }

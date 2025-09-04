@@ -20,9 +20,9 @@ func ClearCookie(c *gin.Context) {
 	c.SetCookie(KeyOfCookieUserId, "", -1, "/", "", false, false)
 }
 
-func SetCookie(c *gin.Context, token, userId, domain string) {
-	c.SetCookie(KeyOfCookieToken, token, 3600, "/", domain, false, true)
-	c.SetCookie(KeyOfCookieUserId, userId, 3600, "/", domain, false, false)
+func SetCookie(c *gin.Context, token, userId, domain string, expiredSeconds int) {
+	c.SetCookie(KeyOfCookieToken, token, expiredSeconds, "/", domain, false, true)
+	c.SetCookie(KeyOfCookieUserId, userId, expiredSeconds, "/", domain, false, false)
 }
 
 func SetRequestUser(c *gin.Context, user any, userId string) {
