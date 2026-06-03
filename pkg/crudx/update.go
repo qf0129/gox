@@ -31,16 +31,16 @@ func UpdateHandler[T any](options ...UpdateHandlerOption) serverx.HandlerFunc {
 
 		target, err := dbx.QueryOneByPk[T](req.Id)
 		if err != nil {
-			return nil, errx.QueryDataFailed.AddErr(err).AddMsgf("id=%v", req.Id)
+			return nil, errx.QueryFailed.AddErr(err).AddMsgf("id=%v", req.Id)
 		}
 
 		if opt != nil && len(opt.UpdateFields) > 0 {
 			if err := dbx.UpdateTargetFileds(target, req.Data, opt.UpdateFields); err != nil {
-				return nil, errx.UpdateDataFailed.AddErr(err)
+				return nil, errx.UpdateFailed.AddErr(err)
 			}
 		} else {
 			if err := dbx.UpdateTarget(target, req.Data); err != nil {
-				return nil, errx.UpdateDataFailed.AddErr(err)
+				return nil, errx.UpdateFailed.AddErr(err)
 			}
 		}
 

@@ -9,29 +9,29 @@ import (
 
 const (
 	KeyOfRequestUser         = "ctx_req_user"
-	KeyOfRequestUserId       = "ctx_req_user_id"
-	KeyOfCookieToken         = "t"
-	KeyOfCookieUserId        = "u"
+	KeyOfRequestUserPk       = "ctx_req_user_pk"
+	KeyOfCookieToken         = "tk"
+	KeyOfCookieUserPk        = "pk"
 	KeyOfHeaderAuthorization = "Authorization"
 )
 
 func ClearCookie(c *gin.Context) {
 	c.SetCookie(KeyOfCookieToken, "", -1, "/", "", false, true)
-	c.SetCookie(KeyOfCookieUserId, "", -1, "/", "", false, false)
+	c.SetCookie(KeyOfCookieUserPk, "", -1, "/", "", false, false)
 }
 
-func SetCookie(c *gin.Context, token, userId, domain string, expiredSeconds int) {
+func SetCookie(c *gin.Context, token, userPk, domain string, expiredSeconds int) {
 	c.SetCookie(KeyOfCookieToken, token, expiredSeconds, "/", domain, false, true)
-	c.SetCookie(KeyOfCookieUserId, userId, expiredSeconds, "/", domain, false, false)
+	c.SetCookie(KeyOfCookieUserPk, userPk, expiredSeconds, "/", domain, false, false)
 }
 
-func SetRequestUser(c *gin.Context, user any, userId string) {
+func SetRequestUser(c *gin.Context, user any, userPk string) {
 	c.Set(KeyOfRequestUser, user)
-	c.Set(KeyOfRequestUserId, userId)
+	c.Set(KeyOfRequestUserPk, userPk)
 }
 
-func GetRequestUserId(c *gin.Context) string {
-	return c.GetString(KeyOfRequestUserId)
+func GetRequestUserPk(c *gin.Context) string {
+	return c.GetString(KeyOfRequestUserPk)
 }
 
 func GetRequestUser[T any](c *gin.Context) T {
@@ -47,29 +47,29 @@ func MiddileWareCheckToken[T any](encryptSecret string, cookieExpiredSeconds int
 			return
 		}
 
-		uid1, err := c.Cookie(KeyOfCookieUserId)
+		cookiePk, err := c.Cookie(KeyOfCookieUserPk)
 		if err != nil {
 			ResponseErr(c, errx.InvalidToken)
 			return
 		}
 
-		uid2, err := securex.ParseToken(tk, encryptSecret, int64(cookieExpiredSeconds))
+		tokenPk, err := securex.ParseToken(tk, encryptSecret, int64(cookieExpiredSeconds))
 		if err != nil {
 			ResponseErr(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
-		if uid1 != uid2 {
+		if cookiePk != tokenPk {
 			ResponseErr(c, errx.InvalidToken.AddErr(err))
 			return
 		}
 
-		existsUser, err := dbx.QueryOneByPk[T](uid2)
+		existsUser, err := dbx.QueryOneByPk[T](tokenPk)
 		if err != nil {
 			ResponseErr(c, errx.UserNotFound.AddErr(err))
 			return
 		}
-		SetRequestUser(c, existsUser, uid2)
+		SetRequestUser(c, existsUser, tokenPk)
 		c.Next()
 	}
 }

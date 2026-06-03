@@ -11,9 +11,10 @@ import (
 )
 
 type User struct {
-	Id   int64  `gorm:"primaryKey;autoIncrement"`
-	Name string `gorm:"type:varchar(255);not null"`
-	Age  int    `gorm:"type:int;not null"`
+	Id      int64  `gorm:"primaryKey;autoIncrement"`
+	Name    string `gorm:"type:varchar(255);"`
+	Age     int    `gorm:"type:int;"`
+	Address string `gorm:"type:varchar(255);"`
 }
 
 func main() {
@@ -27,11 +28,13 @@ func main() {
 		},
 	})
 	app := serverx.NewApp()
-	crudModels := map[string]crudx.CrudModel{
-		"user": {Model: &User{}, Methods: "crud"},
+	crudOption := &crudx.HandlerOption{
+		Models: map[string]crudx.ModelOption{
+			"user": {Model: &User{}},
+		},
 	}
 	app.AddApi(
-		&serverx.ApiInfo{Method: http.MethodPost, Path: "crud", Handler: crudx.CrudHandler(crudModels)},
+		&serverx.ApiInfo{Method: http.MethodPost, Path: "crud", Handler: crudx.CrudHandler(crudOption)},
 	)
 	app.Run()
 }

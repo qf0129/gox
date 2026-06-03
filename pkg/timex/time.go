@@ -11,7 +11,7 @@ import (
 
 type Time time.Time
 
-const format = "2006-01-02 15:04:05"
+const DefaultFormat = "2006-01-02 15:04:05"
 
 func (t *Time) UnmarshalJSON(data []byte) error {
 	if string(data) == "null" {
@@ -19,13 +19,13 @@ func (t *Time) UnmarshalJSON(data []byte) error {
 	}
 	var err error
 	str := string(data)
-	t1, err := time.Parse(format, strings.Trim(str, "\""))
+	t1, err := time.Parse(DefaultFormat, strings.Trim(str, "\""))
 	*t = Time(t1)
 	return err
 }
 
 func (t *Time) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%v\"", time.Time(*t).Format(format))), nil
+	return []byte(fmt.Sprintf("\"%v\"", time.Time(*t).Format(DefaultFormat))), nil
 }
 
 var zeroTime time.Time
@@ -35,7 +35,7 @@ func (t Time) Value() (driver.Value, error) {
 	if tTime.UnixNano() == zeroTime.UnixNano() {
 		return nil, nil
 	}
-	return tTime.Format(format), nil
+	return tTime.Format(DefaultFormat), nil
 }
 
 func (t *Time) Scan(v interface{}) error {

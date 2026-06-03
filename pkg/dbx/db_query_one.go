@@ -45,3 +45,9 @@ func QueryOneWithPreload[T any](filter map[string]any, preloadMap map[string][]a
 func QueryOneByPkWithPreload[T any](pk any, preloadMap map[string][]any) (T, error) {
 	return QueryOneWithPreload[T](map[string]any{Option.ModelPrimaryKey: pk}, preloadMap)
 }
+
+func QueryMaxId[T any]() (int64, error) {
+	var maxId int64
+	err := DB.Model(new(T)).Select("MAX(id)").Scan(&maxId).Error
+	return maxId, err
+}

@@ -69,13 +69,13 @@ func createOne[T any](c *gin.Context, itemData any, opt *CreateHandlerOption) (a
 		return "", errx.PraseJsonError.AddErr(err)
 	}
 	if err := dbx.Create(target); err != nil {
-		return "", errx.CreateDataFailed.AddErr(err)
+		return "", errx.CreateFailed.AddErr(err)
 	}
 
 	targetId := reflectx.StructGet(target, "Id")
 	if opt != nil && opt.AfterHook != nil {
 		if err := opt.AfterHook(c, targetId); err != nil {
-			return "", errx.CreateDataFailed.AddErr(err)
+			return "", errx.CreateFailed.AddErr(err)
 		}
 	}
 	return targetId, nil

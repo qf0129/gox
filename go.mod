@@ -1,6 +1,8 @@
 module github.com/qf0129/gox
 
-go 1.21.0
+go 1.24.0
+
+toolchain go1.24.1
 
 require (
 	github.com/deckarep/golang-set/v2 v2.6.0
@@ -10,9 +12,9 @@ require (
 	github.com/rs/xid v1.5.0
 	golang.org/x/crypto v0.14.0
 	golang.org/x/net v0.17.0
-	golang.org/x/text v0.20.0
+	golang.org/x/text v0.32.0
 	gorm.io/driver/mysql v1.5.2
-	gorm.io/gorm v1.30.1
+	gorm.io/gorm v1.31.1
 )
 
 require (

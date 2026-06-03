@@ -5,10 +5,10 @@ Content-Type: application/json
 
 {
     "Model": "user",
-    "Method": "create",
-    "Create": [
-        {"Name": "test5", "Age": 55},
-        {"Name": "test6", "Age": 66}
+    "Action": "Create",
+    "Data": [
+        {"Name": "test5", "Age": 55, "Address": "shanghai"},
+        {"Name": "test6", "Age": 66, "Address": "shanghai"}
     ]
 }
 
@@ -17,9 +17,33 @@ POST http://localhost:8080/crud
 Content-Type: application/json
 
 {
+    "Action": "QueryFirst",
     "Model": "user",
-    "Method": "read",
-    "Select": ["ID", "Name", "age"]
+    "Filter": {"Id": [1]},
+    "Select": ["id", "name", "age", "Address"]
+}
+
+### R
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Action": "QueryMany",
+    "Model": "user",
+    "Select": ["id", "name", "age", "Address"],
+    "Order": "id desc"
+}
+
+### R
+POST http://localhost:8080/crud
+Content-Type: application/json
+
+{
+    "Action": "QueryPage",
+    "Model": "user",
+    "Select": ["id", "name", "age", "Address"],
+    "Order": "id desc",
+    "PageSize": 2
 }
 
 ### U
@@ -28,9 +52,9 @@ Content-Type: application/json
 
 {
     "Model": "user",
-    "Method": "update",
-    "Update": {"Age": "77"},
-    "Where": {"Age": [66]}
+    "Action": "Update",
+    "Data": {"Age": "666666"},
+    "Filter": {"Age": [666]}
 }
 
 ### D
@@ -40,7 +64,7 @@ Content-Type: application/json
 {
     "Model": "user",
     "Method": "delete",
-    "Where": {"Age": [77]}
+    "Filter": {"Age": [77]}
 }
 
 ### C
@@ -50,5 +74,5 @@ Content-Type: application/json
 {
     "Model": "user",
     "Method": "count",
-    "Where": {"Age": [22]}
+    "Filter": {"Age": [22]}
 }

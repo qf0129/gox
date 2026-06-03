@@ -13,9 +13,9 @@ func ReadHandler[T any]() serverx.HandlerFunc {
 		if err := c.ShouldBindJSON(&req); err != nil {
 			return nil, errx.InvalidParams.AddErr(err)
 		}
-		result, err := dbx.QueryPage[T](&req)
+		result, err := dbx.QueryPage(&req)
 		if err != nil {
-			return nil, errx.QueryDataFailed.AddErr(err)
+			return nil, errx.QueryFailed.AddErr(err)
 		}
 		return result, nil
 	}
