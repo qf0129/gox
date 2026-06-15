@@ -16,24 +16,26 @@ type PageBody[T any] struct {
 	Total    int64
 }
 
-type QueryOption[T any] struct {
-	Select   []string         // 指定查询字段
-	Model    *T               // 结构体查询条件
-	Filter   map[string]any   // 简单查询条件
-	Where    map[string]any   // 自定义复杂查询条件
-	Preload  map[string][]any // 预加载关联查询
-	OrderBy  string           // 排序, eg: "create_time desc, update_time"
-	Limit    int              // QueryAll时限定查询条数
-	Page     int              // QueryPage时指定查询页数
-	PageSize int              // QueryPage时指定每页数量
+type QueryOption struct {
+	Select   []string          // 选择字段
+	Omit     []string          // 排除字段
+	Like     map[string]string // 模糊查询条件
+	Filter   map[string]any    // 简单过滤条件
+	Where    map[string]any    // 复杂条件
+	Preload  map[string][]any  // 关联查询
+	OrderBy  string            // 排序, eg: "create_time desc, update_time"
+	Limit    int               // QueryAll时限定查询条数
+	Page     int               // QueryPage时指定查询页数
+	PageSize int               // QueryPage时指定每页数量
+	Extra    func(query *gorm.DB) *gorm.DB
 }
 
-func NewQuery[T any](options ...*QueryOption[T]) (*gorm.DB, *QueryOption[T]) {
-	var opt *QueryOption[T]
+func newQuery[T any](options ...*QueryOption) (*gorm.DB, *QueryOption) {
+	var opt *QueryOption
 	if len(options) > 0 {
 		opt = options[0]
 	} else {
-		opt = &QueryOption[T]{}
+		opt = &QueryOption{}
 	}
 	if opt.Page < 1 {
 		opt.Page = 1
@@ -44,7 +46,6 @@ func NewQuery[T any](options ...*QueryOption[T]) (*gorm.DB, *QueryOption[T]) {
 	query := DB.Model(new(T))
 	query = setQuerySelect(query, opt.Select)
 	query = setQueryFilter(query, opt.Filter)
-	query = setQueryStruct(query, opt.Model)
 	query = setQueryWhere(query, opt.Where)
 	query = setQueryPreload(query, opt.Preload)
 	query = setQueryOrderBy(query, opt.OrderBy)
@@ -55,13 +56,6 @@ func NewQuery[T any](options ...*QueryOption[T]) (*gorm.DB, *QueryOption[T]) {
 func setQuerySelect(query *gorm.DB, fields []string) *gorm.DB {
 	if len(fields) > 0 {
 		query.Select(fields)
-	}
-	return query
-}
-
-func setQueryStruct[T any](query *gorm.DB, filterStruct *T) *gorm.DB {
-	if filterStruct != nil {
-		query.Where(filterStruct)
 	}
 	return query
 }

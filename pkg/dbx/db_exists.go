@@ -1,7 +1,7 @@
 package dbx
 
 func Exist[T any](filter map[string]any) (bool, error) {
-	count, err := QueryCount(&QueryOption[T]{Filter: filter})
+	count, err := QueryCount[T](&QueryOption{Filter: filter})
 	return count > 0, err
 }
 

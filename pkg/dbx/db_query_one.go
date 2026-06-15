@@ -1,24 +1,7 @@
 package dbx
 
-func QueryOne[T any](filter map[string]any) (target T, err error) {
-	query := DB.Model(new(T))
-	query = setQueryFilter(query, filter)
-	err = query.First(&target).Error
-	return
-}
-func QueryOneTarget[T any](target T, filter map[string]any) error {
-	query := DB.Model(new(T))
-	query = setQueryFilter(query, filter)
-	return query.First(&target).Error
-}
-
 func QueryOneByStruct(params any, target any) (err error) {
 	return DB.Where(params).First(&target).Error
-}
-
-func QueryOneByPk[T any](pk any) (result T, err error) {
-	err = DB.Model(new(T)).Where(map[string]any{Option.ModelPrimaryKey: pk}).First(&result).Error
-	return result, err
 }
 
 func QueryOneByMap[T any](filter map[string]any) (result T, err error) {
@@ -26,12 +9,16 @@ func QueryOneByMap[T any](filter map[string]any) (result T, err error) {
 	return result, err
 }
 
-func QueryOneFieldsMap[T any](fields []string, filter map[string]any) (*map[string]any, error) {
-	t := &map[string]any{}
-	query := DB.Model(new(T)).Select(fields)
-	query = setQueryFilter(query, filter)
-	err := query.First(t).Error
-	return t, err
+func QueryOneByPk[T any](pk any) (T, error) {
+	return QueryOneByMap[T](map[string]any{Option.ModelPrimaryKey: pk})
+}
+
+func QueryOneById[T any](id any) (T, error) {
+	return QueryOneByMap[T](map[string]any{"id": id})
+}
+
+func QueryOneByUid[T any](uid any) (T, error) {
+	return QueryOneByMap[T](map[string]any{"uid": uid})
 }
 
 func QueryOneWithPreload[T any](filter map[string]any, preloadMap map[string][]any) (result T, err error) {
@@ -42,12 +29,25 @@ func QueryOneWithPreload[T any](filter map[string]any, preloadMap map[string][]a
 	return
 }
 
-func QueryOneByPkWithPreload[T any](pk any, preloadMap map[string][]any) (T, error) {
-	return QueryOneWithPreload[T](map[string]any{Option.ModelPrimaryKey: pk}, preloadMap)
+func QueryOneByIdWithPreload[T any](id any, preloadMap map[string][]any) (T, error) {
+	return QueryOneWithPreload[T](map[string]any{"id": id}, preloadMap)
+}
+
+func QueryOneByUidWithPreload[T any](uid any, preloadMap map[string][]any) (T, error) {
+	return QueryOneWithPreload[T](map[string]any{"uid": uid}, preloadMap)
 }
 
 func QueryMaxId[T any]() (int64, error) {
 	var maxId int64
 	err := DB.Model(new(T)).Select("MAX(id)").Scan(&maxId).Error
 	return maxId, err
+}
+
+func QueryTargetByUid(uid any, tgt any) error {
+	return DB.Model(tgt).Where(map[string]any{"uid": uid}).First(tgt).Error
+}
+
+func QueryPluck[T any, R any](cloumn string, filter map[string]any) (result []R, err error) {
+	err = DB.Model(new(T)).Where(filter).Distinct().Pluck(cloumn, &result).Error
+	return
 }

@@ -9,11 +9,11 @@ import (
 
 func ReadHandler[T any]() serverx.HandlerFunc {
 	return func(c *gin.Context) (any, errx.Err) {
-		var req dbx.QueryOption[T]
+		var req dbx.QueryOption
 		if err := c.ShouldBindJSON(&req); err != nil {
 			return nil, errx.InvalidParams.AddErr(err)
 		}
-		result, err := dbx.QueryPage(&req)
+		result, err := dbx.QueryPage[T](&req)
 		if err != nil {
 			return nil, errx.QueryFailed.AddErr(err)
 		}

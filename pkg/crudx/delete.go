@@ -36,7 +36,7 @@ func DeleteHandler[T any](options ...DeleteHandlerOption) serverx.HandlerFunc {
 			if exists, _ := dbx.ExistByPk[T](id); !exists {
 				return nil, errx.TargetNotExists.AddMsgf("id=%v", id)
 			}
-			if err := dbx.DeleteByPk[T](id); err != nil {
+			if err := dbx.DeleteById[T](id); err != nil {
 				return nil, errx.DeleteFailed.AddErr(err).AddMsgf("id=%v", id)
 			}
 			deletedIds = append(deletedIds, id)

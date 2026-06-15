@@ -29,7 +29,7 @@ func UpdateHandler[T any](options ...UpdateHandlerOption) serverx.HandlerFunc {
 			return nil, errx.InvalidJsonParams.AddErr(err)
 		}
 
-		target, err := dbx.QueryOneByPk[T](req.Id)
+		target, err := dbx.QueryOneById[T](req.Id)
 		if err != nil {
 			return nil, errx.QueryFailed.AddErr(err).AddMsgf("id=%v", req.Id)
 		}
