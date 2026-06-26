@@ -3,7 +3,6 @@ package securex
 import (
 	"encoding/binary"
 	"errors"
-	"log"
 	"time"
 
 	"github.com/qf0129/gox/pkg/cryptox"
@@ -17,12 +16,6 @@ func CreateToken(body string, secretKey string) (string, error) {
 	binary.BigEndian.PutUint64(tokenByte[:8], uint64(time.Now().Unix()))
 	for i, v := range body {
 		tokenByte[i+8] = byte(v)
-	}
-	if len(secretKey) == 0 {
-		secretKey = "DEFAULTSECRETKEY"
-	}
-	if len(secretKey) != 16 {
-		log.Fatalf("EncryptSecret Key must be 16 bytes")
 	}
 	return cryptox.EncryptCredential(string(tokenByte), secretKey)
 }
