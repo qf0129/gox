@@ -5,6 +5,8 @@ import (
 	"errors"
 	"log"
 	"time"
+
+	"github.com/qf0129/gox/pkg/cryptox"
 )
 
 var ErrTokenExpired = errors.New("TokenExpired")
@@ -22,17 +24,17 @@ func CreateToken(body string, secretKey string) (string, error) {
 	if len(secretKey) != 16 {
 		log.Fatalf("EncryptSecret Key must be 16 bytes")
 	}
-	return Encrypt(tokenByte, []byte(secretKey))
+	return cryptox.EncryptCredential(string(tokenByte), secretKey)
 }
 
 // 解析令牌
 func ParseToken(token string, secretKey string, expiredSeconds int64) (string, error) {
-	tokenStr, err := Decrypt(token, []byte(secretKey))
+	tokenStr, err := cryptox.DecryptCredential(token, secretKey)
 	if err != nil {
 		return "", err
 	}
 
-	tokenTs := int64(binary.BigEndian.Uint64(tokenStr[0:8]))
+	tokenTs := int64(binary.BigEndian.Uint64([]byte(tokenStr[0:8])))
 	nowTs := time.Now().Unix()
 
 	if nowTs > tokenTs+expiredSeconds {
